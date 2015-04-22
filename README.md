@@ -12,14 +12,16 @@ proposed in
 > Springer (2014)  
 > [[preprint](http://arxiv.org/abs/1409.2603) (v1,2014)]
 
-Files `SelectAStar{Naive,WithOptimalityCheck}?.java` contain implementations
+Files `SelectAStar{Naive}?.java` contain implementations
 of the algorithms we have presented in
 
 > Reitzig, R. and Wild, S.  
 > [A Simple and Fast Linear-Time Algorithm for Proportional Apportionment]()  
 > [[preprint]() (v1,2015)]
 
-Compile and execute `{RunningTime}?Main.java` for performing runtime tests.
+The core algorithms start in the respective implementations of method `unitSize`.
+
+Compile and execute `RunningTimeMain.java` for performing runtime tests.
 You will need [`stdlib.jar`](http://introcs.cs.princeton.edu/stdlib/stdlib.jar)
 from the [book website of Sedgewick/Wayne](http://algs4.cs.princeton.edu/code/).
 
