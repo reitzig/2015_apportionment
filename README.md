@@ -15,9 +15,10 @@ proposed in
 Files `SelectAStar{Naive}?.java` contain implementations
 of the algorithms we have presented in
 
-> Reitzig, R. and Wild, S.  
+> Wild, S. and Reitzig, R.
 > [A Simple and Fast Linear-Time Algorithm for Proportional Apportionment]()  
-> [[preprint]() (v1,2015)]
+> submitted  
+> [[preprint](http://arxiv.org/abs/1504.06475) (v1,2015)]
 
 The core algorithms start in the respective implementations of method `unitSize`.
 
