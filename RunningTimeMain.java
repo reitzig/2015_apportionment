@@ -236,11 +236,13 @@ public class RunningTimeMain {
 		algorithms.put("SelectAstarOptimalityCheck", SelectAStarWithOptimalityCheck.class);
 		algorithms.put("SelectAstar", SelectAStar.class);
 		algorithms.put("AstarChengEppstein", AstarChengEppstein.class);
+		algorithms.put("HighesAverages", HighestAverages.class);
 
 		abbreviations.put("naive", "SelectAstarNaive");
 		abbreviations.put("n", "SelectAstarNaive");
 		abbreviations.put("rw", "SelectAstar");
 		abbreviations.put("ce", "AstarChengEppstein");
+		abbreviations.put("ha", "HighestAverages");
 	}
 
 	public static LinearApportionment algoInstance(String name, double alpha, double beta)
