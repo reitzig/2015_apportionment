@@ -105,6 +105,7 @@ public class RunningTimeMain {
 		//new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
 		BufferedWriter out = null;
+		BufferedWriter avgOut = null;
 		try {
 			out = new BufferedWriter(new FileWriter("apportionment-times-" + name + ".tab"));
 			out.write("algo");
@@ -136,6 +137,17 @@ public class RunningTimeMain {
 			out.write("ns");
 			out.newLine();
 			out.flush();
+			
+			avgOut = new BufferedWriter(new FileWriter("apportionment-times-" + name + "-avgs.tab"));
+			avgOut.write("algo");
+			avgOut.write(SEP);
+			avgOut.write("n");
+			avgOut.write(SEP);
+			avgOut.write("avg-run-ms");
+			avgOut.write(SEP);
+			avgOut.write("avg-run-ms/n");
+			avgOut.newLine();
+			avgOut.flush();
 
 			for (final String algoName : algoNames) {
 				final SedgewickRandom random = new SedgewickRandom(seed);
@@ -143,6 +155,9 @@ public class RunningTimeMain {
 				System.out.println("\n\n\nStarting with algo " + algoName + now());
 				for (final int n : ns) {
 					System.out.println("\tUsing n=" + n + now());
+					
+					double sizeTotalRunMillis = 0.0;
+					
 					for (int inputNr = 1; inputNr <= inputsPerN; ++inputNr) {
 						System.out.println("\t\tinputNr=" + inputNr + now());
 						final ApportionmentInstance input;
@@ -164,7 +179,7 @@ public class RunningTimeMain {
 						final long nanos = endTime - startTime;
 						final double millis = nanos / 1000. / 1000;
 						final double perRunMillis = millis / repetitions;
-
+            sizeTotalRunMillis += perRunMillis;
 
 						out.write(algoName); //"algo"
 						out.write(SEP);
@@ -194,7 +209,18 @@ public class RunningTimeMain {
 						out.write(SEP);
 						out.write("\"" + ns.toString().replaceAll("\\s+","") + "\""); // "ns"
 						out.newLine();
+						System.out.print("\33[1A\33[2K");
 					}
+					
+					avgOut.write(algoName);
+			    avgOut.write(SEP);
+			    avgOut.write(String.valueOf(n));
+			    avgOut.write(SEP);
+			    avgOut.write(String.valueOf(sizeTotalRunMillis / inputsPerN) );
+			    avgOut.write(SEP);
+			    avgOut.write(String.valueOf(sizeTotalRunMillis / inputsPerN / n));
+			    avgOut.newLine();
+			    avgOut.flush();
 				}
 				out.flush();
 			}
@@ -202,8 +228,37 @@ public class RunningTimeMain {
 			if (out != null) {
 				out.close();
 			}
+			if (avgOut != null) {
+				avgOut.close();
+			}
 		}
-
+		
+		// Write gnuplot script the plots the results
+		out = null;
+		try {
+			out = new BufferedWriter(new FileWriter("apportionment-times-" + name + ".gp"));
+			out.write("set terminal pngcairo linewidth 2;"); out.newLine();
+			out.write("set output \"apportionment-times-" + name + "-avgs.png\""); out.newLine();
+			// Averages per size in one plot
+			out.write("plot "); 
+			int i = 0;
+			for (final String algoName : algoNames) {
+			  if ( i > 0 ) out.write(", "); else i++;
+			  out.write("\"<(grep -e " + algoName + "[[:space:]] apportionment-times-" + name + "-avgs.tab)\" using 2:3 ti \"" + algoName + "\"");
+			}
+			out.newLine(); out.newLine();
+			
+			// One plot with all points per algorithm
+			for (final String algoName : algoNames) {
+			  out.write("set output \"apportionment-times-" + name + "-" + algoName + "\".png"); out.newLine();
+  			out.write("plot \"<(grep -e " + algoName + "[[:space:]] apportionment-times-" + name + ".tab)\" using 2:8 ti \"" + algoName + "\""); 
+  			out.newLine(); out.newLine();
+			}
+    } finally {
+			if (out != null) {
+				out.close();
+			}
+		}
 	}
 
 	private static String now() {
