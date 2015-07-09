@@ -38,7 +38,7 @@ public class RunningTimeMain {
 		  IllegalAccessException, IOException {
 		if (args.length < 1) {
 			System.out.println(
-				  "Usage: RunningTimeMain algo1,algo2 [n1,n2] [repetitions-per-timing] [inputs-per-n] [seed] [uniform|exponential] [alpha] [beta]");
+				  "Usage: RunningTimeMain algo1,algo2,... [n1,n2,...] [repetitions-per-timing] [inputs-per-n] [seed] [uniform|exponential] [alpha] [beta]");
 			System.exit(42);
 		}
 
@@ -50,7 +50,7 @@ public class RunningTimeMain {
 		long seed = System.currentTimeMillis();
 
 		final String[] algosArray = args[0].split("\\s*,\\s*");
-		if (args.length >= 2) {
+		if (args.length >= 2) { 
 			final String[] nsArray = args[1].split("\\s*,\\s*");
 			ns = new ArrayList<Integer>(nsArray.length);
 			for (final String n : nsArray) {
@@ -235,14 +235,16 @@ public class RunningTimeMain {
 		algorithms.put("SelectAstarNaive", SelectAStarNaive.class);
 		algorithms.put("SelectAstarOptimalityCheck", SelectAStarWithOptimalityCheck.class);
 		algorithms.put("SelectAstar", SelectAStar.class);
-		algorithms.put("AstarChengEppstein", AstarChengEppstein.class);
-		algorithms.put("HighesAverages", HighestAverages.class);
+		algorithms.put("AStarChengEppstein", AStarChengEppstein.class);
+		algorithms.put("HighestAveragesLS", HighestAveragesLS.class);
+		algorithms.put("HighestAveragesPQ", HighestAveragesPQ.class);
 
 		abbreviations.put("naive", "SelectAstarNaive");
 		abbreviations.put("n", "SelectAstarNaive");
 		abbreviations.put("rw", "SelectAstar");
-		abbreviations.put("ce", "AstarChengEppstein");
-		abbreviations.put("ha", "HighestAverages");
+		abbreviations.put("ce", "AStarChengEppstein");
+		abbreviations.put("hapq", "HighestAveragesPQ");
+		abbreviations.put("hals", "HighestAveragesLS");
 	}
 
 	public static LinearApportionment algoInstance(String name, double alpha, double beta)

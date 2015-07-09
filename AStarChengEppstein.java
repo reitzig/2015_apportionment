@@ -26,8 +26,8 @@ import java.util.*;
  * </p>
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-public class AstarChengEppstein extends LinearApportionment {
-  public AstarChengEppstein(double alpha, double beta) {
+public class AStarChengEppstein extends LinearApportionment {
+  public AStarChengEppstein(double alpha, double beta) {
     super(alpha, beta);
   }
 

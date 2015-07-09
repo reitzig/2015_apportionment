@@ -16,9 +16,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.PriorityQueue;
 import java.util.Comparator;
 
-public class HighestAverages extends LinearApportionment {
+public class HighestAveragesPQ extends LinearApportionment {
 
-	public HighestAverages(final double alpha, final double beta) {
+	public HighestAveragesPQ(final double alpha, final double beta) {
 		super(alpha, beta);
 	}
 
@@ -35,7 +35,7 @@ public class HighestAverages extends LinearApportionment {
       
     // Seed heap with initial values
     for ( int i=0; i<population.length; i++ ) {
-      heap.add(new Entry(i, population[i]/d(0)));
+      heap.add(new Entry(i, d(0)/population[i]));
     }
     
     // Subsequently assign seats
@@ -44,8 +44,9 @@ public class HighestAverages extends LinearApportionment {
       final Entry e = heap.poll();
       final int i = e.index;
       seats[i]++;
-      e.value = population[i] / d(seats[i]);
+      e.value = d(seats[i])/population[i];
       heap.add(e);
+      k--;
     }
     
     // Next element determines the last seat

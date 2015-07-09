@@ -92,7 +92,9 @@ class Main {
 			new SelectAStarNaive(2, 1).unitSize(instance.population, 33);
 			new SelectAStarWithOptimalityCheck(2, 1).unitSize(instance.population, 33);
 			new SelectAStar(2, 1).unitSize(instance.population, 33);
-			new AstarChengEppstein(2, 1).unitSize(instance.population, 33);
+			new AStarChengEppstein(2, 1).unitSize(instance.population, 33);
+			new HighestAveragesPQ(2, 1).unitSize(instance.population, 33);
+			new HighestAveragesLS(2, 1).unitSize(instance.population, 33);
 		}
 
 		System.out.println("Warmup finished");
@@ -133,16 +135,24 @@ class Main {
 
 	private static void runAllOn(ApportionmentInstance instance, double alpha, double beta)
 		  throws Exception {
-		List<LinearApportionment> algs = Arrays.asList(new SelectAStarNaive(alpha,
-			  beta), new SelectAStarWithOptimalityCheck(alpha, beta), new AstarChengEppstein(alpha, beta),
-			  new SelectAStar(alpha, beta));
+		List<LinearApportionment> algs = Arrays.asList(
+		  new SelectAStarNaive(alpha, beta), 
+		  new SelectAStarWithOptimalityCheck(alpha, beta), 
+		  new AStarChengEppstein(alpha, beta),
+			new SelectAStar(alpha, beta),
+			new HighestAveragesLS(alpha, beta),
+			new HighestAveragesPQ(alpha, beta));
 		runAlgsOn(instance, algs);
 	}
 
 	private static void runLinearAlgsOn(ApportionmentInstance instance, double alpha, double beta)
 		  throws Exception {
-		List<LinearApportionment> algs = Arrays.asList(new SelectAStarWithOptimalityCheck(alpha, beta),
-			  new AstarChengEppstein(alpha, beta), new SelectAStar(alpha, beta));
+		List<LinearApportionment> algs = Arrays.asList(
+		  new SelectAStarWithOptimalityCheck(alpha, beta),
+		  new AStarChengEppstein(alpha, beta), 
+		  new SelectAStar(alpha, beta),
+			new HighestAveragesLS(alpha, beta),
+			new HighestAveragesPQ(alpha, beta));
 		runAlgsOn(instance, algs);
 	}
 
@@ -187,7 +197,7 @@ class Main {
 //		int k = 6;
 			System.out.println("\n\nk = " + k);
 
-			LinearApportionment ce = new AstarChengEppstein(alpha, beta);
+			LinearApportionment ce = new AStarChengEppstein(alpha, beta);
 			LinearApportionment sel = new SelectAStarWithOptimalityCheck(alpha, beta);
 			LinearApportionment pri = new SelectAStarNaive(alpha, beta);
 			System.out.println("\tExample: " + sel.unitSize(example, k) + "");
