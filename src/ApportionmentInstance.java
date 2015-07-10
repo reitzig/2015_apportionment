@@ -35,7 +35,7 @@ class ApportionmentInstance {
 		for (int i = 0; i < population.length; i++) {
 			population[i] = random.uniform(1, 100);
 		}
-		final int k = random.uniform(n, 10 * n);
+		final int k = random.uniform(5 * n, 10 * n);
 		return new ApportionmentInstance(population, k);
 	}
 
@@ -48,7 +48,7 @@ class ApportionmentInstance {
 		for (int i = 0; i < population.length; i++) {
 			population[i] = 1 + random.exp(10);
 		}
-		final int k = random.uniform(n, 10 * n);
+		final int k = random.uniform(5* n, 10 * n);
 		return new ApportionmentInstance(population, k);
 	}
 

@@ -1,4 +1,4 @@
-<project name="apportionment" basedir="." default="run">
+<project name="apportionment" basedir="." default="compile">
   <property name="src" location="src"/>
   <property name="build" location="build"/>
   <property name="lib" location="lib/"/>
@@ -34,7 +34,7 @@
       <format property="TODAY_DE" pattern="yyMMddHHmmss"/>
     </tstamp>
     <java classname="RunningTimeMain" fork="true" dir=".">
-      <arg line="rw,ce,hapq,hals 25,50,75,100 10000 100 ${TODAY} uniform 2 1"/>
+      <arg line="rw,ce,hapq,hals 25,50,75,100 10000 100 ${TODAY_DE} uniform 2 1"/>
       <classpath>
         <pathelement path="${build}"/>
         <pathelement path="${java.class.path}"/>

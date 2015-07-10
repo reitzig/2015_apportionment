@@ -25,15 +25,22 @@ priority queues resp. a linear scan for finding maxima in
 
 The core algorithms start in the respective implementations of method `unitSize`.
 
-If you can use Ant, execute `ant test` for basic correctness testing.
-Command `ant run` executes a comparative runtime experiment.
-
-Compile and execute `RunningTimeMain.java` for performing runtime tests.
-You will need [`stdlib.jar`](http://introcs.cs.princeton.edu/stdlib/stdlib.jar)
-from the [book website of Sedgewick/Wayne](http://algs4.cs.princeton.edu/code/).
-
 The remaining files provide interfaces and utility code. 
 Some files are taken or adapted from 
   [Sedgewick/Wayne](http://algs4.cs.princeton.edu/23quicksort/QuickPedantic.java.html)
 with our thanks; we re-release their files in agreement with their 
 license statement (see Q + A [here](http://algs4.cs.princeton.edu/code/)).
+
+### Compilation
+
+Execute `ant compile`; you will need [`stdlib.jar`](http://introcs.cs.princeton.edu/stdlib/stdlib.jar)
+(in folder `lib`) from the [book website of Sedgewick/Wayne](http://algs4.cs.princeton.edu/code/).
+
+### Usage
+
+Run `ant test` for basic correctness testing.
+Command `ant run` executes a sample runtime experiment.
+
+Run your own experiments by defining the parameters in a space-separated file
+(e.g. [arxiv.experiment](https://github.com/reitzig/2015_apportionment/blob/master/arxiv.experiment); those are the one from the article) and passing it as parameter
+to [`run_experiments.rb`](https://github.com/reitzig/2015_apportionment/blob/master/run_experiments.rb).

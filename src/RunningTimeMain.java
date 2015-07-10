@@ -252,9 +252,9 @@ public class RunningTimeMain {
 			// Averages per size normalized by n in one plot
 			out.write("set output \"apportionment-times-" + name + "-avgsNorm.png\""); out.newLine();
 			out.write("plot "); 
-			int i = 0;
+			int j = 0;
 			for (final String algoName : algoNames) {
-			  if ( i > 0 ) out.write(", "); else i++;
+			  if ( j > 0 ) out.write(", "); else j++;
 			  out.write("\"<(grep -e " + algoName + "[[:space:]] apportionment-times-" + name + "-avgs.tab)\" using 2:4 ti \"" + algoName + "\"");
 			}
 			out.newLine(); out.newLine();
