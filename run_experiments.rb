@@ -43,20 +43,22 @@ ARGV.each { |f|
         end
       
         params = line.split(/\s+/)
-        if ( params.size != 8 )
+        if ( params.size != 9 )
           puts eval(ERRORPREFIX) + "need eight columns."
           next
         end
         
         exp = [params[0]]
-        if ( /\d+(,\d+)*/ =~ params[1] )
-          exp.push(params[1])
-        else
-          puts eval(ERRORPREFIX) + "column 2 needs to be a comma-separated list of integers."
-          next
-        end
+        (1..2).each { |i|
+          if ( /\d+(,\d+)*/ =~ params[i] )
+            exp.push(params[i])
+          else
+            puts eval(ERRORPREFIX) + "column #{i+1} needs to be a comma-separated list of integers."
+            next
+          end
+        }
         
-        (2..3).each { |i|
+        (3..4).each { |i|
           if ( /\d+/ =~ params[i] )
             exp.push(params[i])
           else
@@ -65,23 +67,23 @@ ARGV.each { |f|
           end
         }
         
-        if ( /\d+/ =~ params[4] )
-          exp.push(params[4])
-        elsif ( "NOW" == params[4] )
+        if ( /\d+/ =~ params[5] )
+          exp.push(params[5])
+        elsif ( "NOW" == params[5] )
           exp.push((Time.now.to_r * 1000000).to_i.to_s)
         else
-          puts eval(ERRORPREFIX) + "column 5 needs to be an integer or 'NOW'."
+          puts eval(ERRORPREFIX) + "column 6 needs to be an integer or 'NOW'."
             next
         end
         
-        if ( DISTRIBUTIONS.include?(params[5]) )
-          exp.push(params[5])
+        if ( DISTRIBUTIONS.include?(params[6]) )
+          exp.push(params[6])
         else
-          puts eval(ERRORPREFIX) + "column 6 needs to be one of #{DISTRIBUTIONS.join(", ")}."
+          puts eval(ERRORPREFIX) + "column 7 needs to be one of #{DISTRIBUTIONS.join(", ")}."
           next
         end
         
-        (6..7).each { |i|
+        (7..8).each { |i|
           if ( /\d+(\.\d+)?/ =~ params[i] )
             exp.push(params[i])
           else
@@ -96,7 +98,7 @@ ARGV.each { |f|
   end
 }
 
-dir = "experiments #{Time.now.strftime("%Y-%m-%d-%H:%M:%S")}"
+dir = "experiments_#{Time.now.strftime("%Y-%m-%d-%H:%M:%S")}"
 Dir.mkdir(dir)
 Dir.chdir(dir)
 puts "Performing #{experiments.size} experiments..."

@@ -26,34 +26,65 @@ class ApportionmentInstance {
 	double[] population;
 	int k;
 
-	static ApportionmentInstance uniformRandomInstance(int n) {
-		return uniformRandomInstance(SedgewickRandom.instance, n);
+	static ApportionmentInstance uniformRandomInstance(final int n, final KFactory k) {
+		return uniformRandomInstance(SedgewickRandom.instance, n, k);
 	}
 
-	static ApportionmentInstance uniformRandomInstance(SedgewickRandom random, int n) {
+	static ApportionmentInstance uniformRandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
 		final double[] population = new double[n];
 		for (int i = 0; i < population.length; i++) {
 			population[i] = random.uniform(1, 100);
 		}
-		final int k = random.uniform(5 * n, 10 * n);
-		return new ApportionmentInstance(population, k);
+		return new ApportionmentInstance(population, k.sampleFactor(random) * n);
 	}
 
-	static ApportionmentInstance exponentialRandomInstance(int n) {
-		return exponentialRandomInstance(SedgewickRandom.instance, n);
+	static ApportionmentInstance exponentialRandomInstance(final int n, final KFactory k) {
+		return exponentialRandomInstance(SedgewickRandom.instance, n, k);
 	}
 
-	static ApportionmentInstance exponentialRandomInstance(SedgewickRandom random, int n) {
+	static ApportionmentInstance exponentialRandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
 		final double[] population = new double[n];
 		for (int i = 0; i < population.length; i++) {
 			population[i] = 1 + random.exp(10);
 		}
-		final int k = random.uniform(5* n, 10 * n);
-		return new ApportionmentInstance(population, k);
+		return new ApportionmentInstance(population, k.sampleFactor(random) * n);
 	}
 
 	@Override public String toString() {
 		return "Instance(" + "population=" + Arrays.toString(population) + ", k=" + k
 			  + ')';
+	}
+	
+	static class KFactory {
+	  int minK;
+	  int maxK;
+	  
+	  /** Creates a factory that always samples k*n. */
+	  KFactory(int k) {
+	    minK = k;
+	    maxK = k;
+	  }
+	  
+	  /** Creates a factory that samples uniformly from interval [min*n,max*n]. */
+	  KFactory(int min, int max) {
+	    assert min <= max;
+	    minK = min;
+	    maxK = max;
+	  }
+	  
+	  int sampleFactor(SedgewickRandom r) {
+	    if ( minK == maxK )
+	      return minK;
+	    else
+	      return r.uniform(minK, maxK);
+	  }
+	  
+	  @Override
+	  public String toString() {
+	    if ( minK == maxK ) 
+	      return Integer.toString(minK) + "*n";
+	    else 
+	      return "U[" + minK + "*n, " + maxK + "*n]";
+	  }
 	}
 }

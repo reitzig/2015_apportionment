@@ -43,6 +43,7 @@ public class RunningTimeMain {
 		}
 
 		List<Integer> ns = Arrays.asList(10, 20);
+		ApportionmentInstance.KFactory k = new ApportionmentInstance.KFactory(5,10);
 		int repetitions = 1;
 		int inputsPerN = 1;
 		String inputType = "uniform";
@@ -58,22 +59,31 @@ public class RunningTimeMain {
 			}
 		}
 		if (args.length >= 3) {
-			repetitions = Integer.parseInt(args[2]);
+		  final String[] ksArray = args[2].split("\\s*,\\s*");
+			if ( ksArray.length == 1 ) {
+			  k = new ApportionmentInstance.KFactory(Integer.parseInt(ksArray[0]));
+			}
+			else if ( ksArray.length == 2 ) {
+			  k = new ApportionmentInstance.KFactory(Integer.parseInt(ksArray[0]), Integer.parseInt(ksArray[1]));
+			}
 		}
 		if (args.length >= 4) {
-			inputsPerN = Integer.parseInt(args[3]);
+			repetitions = Integer.parseInt(args[3]);
 		}
 		if (args.length >= 5) {
-			seed = Long.parseLong(args[4]);
+			inputsPerN = Integer.parseInt(args[4]);
 		}
 		if (args.length >= 6) {
-			inputType = args[5];
+			seed = Long.parseLong(args[5]);
 		}
 		if (args.length >= 7) {
-			alpha = Double.parseDouble(args[6]);
+			inputType = args[6];
 		}
 		if (args.length >= 8) {
-			beta = Double.parseDouble(args[7]);
+			alpha = Double.parseDouble(args[7]);
+		}
+		if (args.length >= 9) {
+			beta = Double.parseDouble(args[8]);
 		}
 
 		final List<String> algoNames = new LinkedList<String>();
@@ -92,6 +102,7 @@ public class RunningTimeMain {
 		}
 
 		System.out.println("ns = " + ns);
+		System.out.println("ks ~ " + k.toString());
 		System.out.println("repetitions = " + repetitions);
 		System.out.println("algoNames = " + algoNames);
 		System.out.println("inputType = " + inputType);
@@ -162,9 +173,9 @@ public class RunningTimeMain {
 						System.out.println("\t\tinputNr=" + inputNr + now());
 						final ApportionmentInstance input;
 						if ("uniform".equals(inputType)) {
-							input = ApportionmentInstance.uniformRandomInstance(random, n);
+							input = ApportionmentInstance.uniformRandomInstance(random, n, k);
 						} else if ("exponential".equals(inputType)) {
-							input = ApportionmentInstance.exponentialRandomInstance(random,n);
+							input = ApportionmentInstance.exponentialRandomInstance(random,n,k);
 						} else {
 							throw new IllegalArgumentException(
 								  "Unknown input type " + inputType);
@@ -284,7 +295,7 @@ public class RunningTimeMain {
 		
 		for (int i = 0; i < 12000; ++i) {
 			final ApportionmentInstance instance =
-				  ApportionmentInstance.uniformRandomInstance(30);
+				  ApportionmentInstance.uniformRandomInstance(30, new ApportionmentInstance.KFactory(5));
 			for (final String algoName : algoNames) {
 				algoInstance(algoName, alpha, beta).unitSize(instance.population, 33);
 			}

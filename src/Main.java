@@ -42,7 +42,7 @@ class Main {
 
 
 		for (int i = 0; i < 5; ++i)
-			runAllOn(ApportionmentInstance.exponentialRandomInstance(30), 1, 0);
+			runAllOn(ApportionmentInstance.exponentialRandomInstance(30, new ApportionmentInstance.KFactory(5)), 1, 0);
 
 //		runAlgsOn(Instance.uniformRandomInstance(1000000),
 //			  Arrays.<LinearApportionment>asList(new SelectAStarNoOptimalityCheck(2, 1)));
@@ -88,7 +88,7 @@ class Main {
 	private static void warmup() {// warm up JIT
 		for (int i = 0; i < 12000; ++i) {
 			final ApportionmentInstance
-				  instance = ApportionmentInstance.uniformRandomInstance(30);
+				  instance = ApportionmentInstance.uniformRandomInstance(30, new ApportionmentInstance.KFactory(5,10));
 			new SelectAStarNaive(2, 1).unitSize(instance.population, 33);
 			new SelectAStarWithOptimalityCheck(2, 1).unitSize(instance.population, 33);
 			new SelectAStar(2, 1).unitSize(instance.population, 33);
