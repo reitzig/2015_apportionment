@@ -104,8 +104,20 @@ Dir.chdir(dir)
 puts "Performing #{experiments.size} experiments..."
 puts "\t(Follow progress with 'tail -f #{dir}/experiments.log')"
 experiments.each { |e|
-  `java -cp ../build RunningTimeMain #{experiments.join(" ")} >> experiments.log`
+  `java -cp ../build RunningTimeMain #{e.join(" ")} >> experiments.log`
+  `echo "\n\n\n" >> experiments.log`
 }
+
+# Prettify log
+lines = []
+File.open("experiments.log", "r") { |f|
+  lines = f.readlines
+}
+lines.map! { |l| l.gsub("\33[1A\33[2K", " " * 8) }
+File.open("experiments.log", "w") { |f|
+  f.write(lines.join)
+}
+
 puts "Plotting..."
 Dir["*.gp"].each { |gp|
   `gnuplot #{gp}`
