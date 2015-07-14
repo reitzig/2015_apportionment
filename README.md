@@ -1,4 +1,4 @@
-# Linear-Time Algorithms for Proportional Apportionment
+## Linear-Time Algorithms for Proportional Apportionment
 
 This repository contains implementations of algorithms for proportional 
 apportionment from two separate articles. Inspect and use at your own risk.

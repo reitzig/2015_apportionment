@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# Requires: Ruby 1.9.3, Ant, Java 7, gnuplot, GNU utilities
+
 if ( ARGV.size < 1 )
   puts "Usage: ruby run_experiments.rb FILES...";
   Process.exit
