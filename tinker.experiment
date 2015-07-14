@@ -1,2 +1,6 @@
+# Hopefully meaningful experiments with k = 5*n, Sainte-Lague
 rw,ce,hapq,hals 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 5 10000 100 NOW uniform 2 1
-rw,ce,hapq      1000,5000,10000,50000,100000 5 10 100 NOW uniform 2 1
+rw,ce,hapq      1000,5000,10000,20000,30000,40000,50000,75000,100000 5 10 100 NOW uniform 2 1
+
+# Hopefully meaningful experiments with k = 10*n, Sainte-Lague
+rw,ce,hapq,hals 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 10 10000 100 NOW uniform 2 1
