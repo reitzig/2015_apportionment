@@ -249,6 +249,7 @@ public class RunningTimeMain {
 		try {
 			out = new BufferedWriter(new FileWriter("apportionment-times-" + name + ".gp"));
 			out.write("set terminal pngcairo linewidth 2;"); out.newLine();
+			out.write("set key top left;"); out.newLine();
 			
 			// Averages per size in one plot
 			out.write("set output \"apportionment-times-" + name + "-avgs.png\""); out.newLine();
