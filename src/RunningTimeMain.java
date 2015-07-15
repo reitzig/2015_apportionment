@@ -112,13 +112,18 @@ public class RunningTimeMain {
 
 		warmup(algoNames, alpha, beta);
 
-		final String name = inputType + "-ns-" + ns.toString().replaceAll("\\s+","") + "-rep-" + repetitions + "-per-n-" + inputsPerN + "-seed-" + seed;
+		final String name = "votes=" + inputType + 
+		                    "-N=" + ns.toString().replaceAll("\\s+","") + 
+		                    "-K=" + k.toString() + 
+		                    "-reps=" + repetitions + 
+		                    "-perN=" + inputsPerN + 
+		                    "-seed=" + seed;
 		//new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
 		BufferedWriter out = null;
 		BufferedWriter avgOut = null;
 		try {
-			out = new BufferedWriter(new FileWriter("apportionment-times-" + name + ".tab"));
+			out = new BufferedWriter(new FileWriter("times-" + name + ".tab"));
 			out.write("algo");
 			out.write(SEP);
 			out.write("n");
@@ -149,7 +154,7 @@ public class RunningTimeMain {
 			out.newLine();
 			out.flush();
 			
-			avgOut = new BufferedWriter(new FileWriter("apportionment-times-" + name + "-avgs.tab"));
+			avgOut = new BufferedWriter(new FileWriter("avgtimes-" + name + ".tab"));
 			avgOut.write("algo");
 			avgOut.write(SEP);
 			avgOut.write("n");
@@ -247,34 +252,34 @@ public class RunningTimeMain {
 		// Write gnuplot script the plots the results
 		out = null;
 		try {
-			out = new BufferedWriter(new FileWriter("apportionment-times-" + name + ".gp"));
+			out = new BufferedWriter(new FileWriter("plots-" + name + ".gp"));
 			out.write("set terminal pngcairo linewidth 2;"); out.newLine();
 			out.write("set key top left;"); out.newLine();
 			
 			// Averages per size in one plot
-			out.write("set output \"apportionment-times-" + name + "-avgs.png\""); out.newLine();
+			out.write("set output \"avgtimes-" + name + ".png\""); out.newLine();
 			out.write("plot "); 
 			int i = 0;
 			for (final String algoName : algoNames) {
 			  if ( i > 0 ) out.write(", "); else i++;
-			  out.write("\"<(grep -e " + algoName + "[[:space:]] apportionment-times-" + name + "-avgs.tab)\" using 2:3 ti \"" + algoName + "\"");
+			  out.write("\"<(grep -e " + algoName + "[[:space:]] avgtimes-" + name + ".tab)\" using 2:3 ti \"" + algoName + "\"");
 			}
 			out.newLine(); out.newLine();
 			
 			// Averages per size normalized by n in one plot
-			out.write("set output \"apportionment-times-" + name + "-avgsNorm.png\""); out.newLine();
+			out.write("set output \"avgtimesNorm-" + name + ".png\""); out.newLine();
 			out.write("plot "); 
 			int j = 0;
 			for (final String algoName : algoNames) {
 			  if ( j > 0 ) out.write(", "); else j++;
-			  out.write("\"<(grep -e " + algoName + "[[:space:]] apportionment-times-" + name + "-avgs.tab)\" using 2:4 ti \"" + algoName + "\"");
+			  out.write("\"<(grep -e " + algoName + "[[:space:]] avgtimes-" + name + ".tab)\" using 2:4 ti \"" + algoName + "\"");
 			}
 			out.newLine(); out.newLine();
 			
 			// One plot with all points per algorithm
 			for (final String algoName : algoNames) {
-			  out.write("set output \"apportionment-times-" + name + "-" + algoName + ".png\""); out.newLine();
-  			out.write("plot \"<(grep -e " + algoName + "[[:space:]] apportionment-times-" + name + ".tab)\" using 2:8 ti \"" + algoName + "\""); 
+			  out.write("set output \"times-" + algoName + "-" + name + ".png\""); out.newLine();
+  			out.write("plot \"<(grep -e " + algoName + "[[:space:]] times-" + name + ".tab)\" using 2:8 ti \"" + algoName + "\""); 
   			out.newLine(); out.newLine();
 			}
     } finally {
