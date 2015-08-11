@@ -15,6 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package de.unikl.cs.agak.appportionment.methods;
 
+import de.unikl.cs.agak.appportionment.Apportionment;
+
 import java.util.PriorityQueue;
 import java.util.Comparator;
 
@@ -33,22 +35,18 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
 		super(alpha, beta);
 	}
 
+
   @Override
-  public double unitSize(final double[] population, int k) {
-    throw new UnsupportedOperationException("deprecated");
-  }
-  
-  @Override
-  public int[] apportion(final double[] population, int k) {
+  public Apportionment apportion(final double[] votes, int k) {
     // Compute initial assignment using guess sum(population)/k
-    final int[] seats = new int[population.length];
+    final int[] seats = new int[votes.length];
     
     double sumPop = 0;
-    for ( double p : population ) { sumPop += p; }
-    final double D = k / sumPop;
+    for ( double p : votes ) { sumPop += p; }
+    final double D = k / sumPop; // TODO if beta <= alpha then D = k / (sumPop + votes.length * (beta/alpha - 0.5))
     
-    for ( int i=0; i<population.length; i++ ) {
-      seats[i] = (int) Math.floor(deltaInv(population[i] * D)) + 1; // TODO correct?
+    for ( int i=0; i<votes.length; i++ ) {
+      seats[i] = (int) Math.floor(deltaInv(votes[i] * D)) + 1; // TODO correct?
     }
     
     int sumSeats = 0;
@@ -58,7 +56,7 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
     final int offset;
     final int step;
     if ( sumSeats == k ) {
-      return seats;
+      return new Apportionment(seats, D);
     }
     else if ( sumSeats < k ) {
       // Setup: max-heap, offset for next d_i, add seats
@@ -74,7 +72,7 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
     }
     
     // Initialize heap
-    final PriorityQueue<Entry> heap = new PriorityQueue<Entry>(population.length,     
+    final PriorityQueue<Entry> heap = new PriorityQueue<Entry>(votes.length,
       new Comparator<Entry>() {
         @Override
         public int compare(final Entry e1, final Entry e2) {
@@ -83,8 +81,8 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
       });
       
     // Seed heap with initial values
-    for ( int i=0; i<population.length; i++ ) {
-      heap.add(new Entry(i, d(seats[i] + offset) / population[i]));
+    for ( int i=0; i<votes.length; i++ ) {
+      heap.add(new Entry(i, d(seats[i] + offset) / votes[i]));
     }
     
     // Subsequently adapt seats
@@ -92,12 +90,12 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
       final Entry e = heap.poll();
       final int i = e.index;
       seats[i] += step;
-      e.value = d(seats[i] + offset) / population[i];
+      e.value = d(seats[i] + offset) / votes[i];
       heap.add(e);
       sumSeats += step;
     }
     
-    return seats;
+    return new Apportionment(seats,0.0); // TODO compute value
   }
   
   private static class Entry {

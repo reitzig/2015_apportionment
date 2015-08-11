@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package de.unikl.cs.agak.appportionment.methods;
 
+import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.util.RankSelection;
 
 import java.util.*;
@@ -36,12 +37,11 @@ public class AStarChengEppstein extends LinearApportionmentMethod {
     super(alpha, beta);
   }
 
-  @Override
-  public double unitSize(double[] population, int k) {
+  private double unitSize(double[] votes, int k) {
     // Initialize sequences
     // TODO move to 𝒜, ξ? Seems to skrew with most IDEs, though.
     Collection<Sequence> A = new LinkedList<Sequence>();
-    for ( double v_i : population ) {
+    for ( double v_i : votes ) {
       A.add(new Sequence(v_i));
     }
     
@@ -55,8 +55,24 @@ public class AStarChengEppstein extends LinearApportionmentMethod {
     
     return coarseToExact(A, k, coarse);
   }
-  
-  Collection<Sequence> findContributingSequences(Collection<Sequence> A, int k) {
+
+    @Override
+    public Apportionment apportion(double[] votes, int k) {
+         // Compute $a^*$
+        final double astar = unitSize(votes, k);
+
+        // Derive seats
+        final int[] seats = new int[votes.length];
+        for (int i = 0; i < votes.length; i++) {
+            seats[i] = new Double(Math.floor(deltaInv(votes[i] * astar))).intValue() + 1;
+        }
+
+        // TODO resolve ties? May assign more than k seats now
+
+        return new Apportionment(seats, astar);
+    }
+
+    Collection<Sequence> findContributingSequences(Collection<Sequence> A, int k) {
     Collection<Sequence> C = new LinkedList<Sequence>();
 
     while ( A.size() > 0 ) {

@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package de.unikl.cs.agak.appportionment.experiments;
 
+import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.methods.*;
 import edu.princeton.cs.introcs.Stopwatch;
@@ -166,16 +167,16 @@ class Main {
 
 	private static void runAlgsOn(final ApportionmentInstance instance,
 		  final List<LinearApportionmentMethod> algs) throws Exception {
-		Map<LinearApportionmentMethod, int[]> apportionments =
-			  new HashMap<LinearApportionmentMethod, int[]>(8);
+		Map<LinearApportionmentMethod, Apportionment> apportionments =
+			  new HashMap<LinearApportionmentMethod, Apportionment>(8);
 		for (final LinearApportionmentMethod alg : algs) {
 
 			try {
 				final Stopwatch stopwatch = new Stopwatch();
-				final int[] seats = alg.apportion(instance.votes, instance.k);
+				final Apportionment app = alg.apportion(instance.votes, instance.k);
 				System.out.println(alg + " took " + stopwatch.elapsedTime() + "s.");
 
-				apportionments.put(alg, seats);
+				apportionments.put(alg, app);
 			} catch (Exception e) {
 				System.out.println("instance = " + instance);
 				throw e;
@@ -184,7 +185,7 @@ class Main {
 		System.out.println("apportionments = " + apportionments);
 		// all equal? 
 		// TODO does not make sense anymore
-		int[] value = null;
+		Apportionment value = null;
 		for (final LinearApportionmentMethod alg : algs) {
 			if (value == null) value = apportionments.get(alg);
 			else if (!value.equals(apportionments.get(alg))) {
@@ -210,15 +211,15 @@ class Main {
 			LinearApportionmentMethod sel = new SelectAStarWithOptimalityCheck(alpha, beta);
 			LinearApportionmentMethod pri = new SelectAStarNaive(alpha, beta);
 			LinearApportionmentMethod puk = new PukelsheimPQ(alpha, beta);
-			System.out.println("\tExample: " + sel.unitSize(example, k) + "");
-			System.out.println("\tExample: " + pri.unitSize(example, k) + "");
-			System.out.println("\tExample 1/unit: " + 1 / sel.unitSize(example, k) + "");
-			System.out.println("\tExample: " + ce.unitSize(example, k) + "");
+			System.out.println("\tExample: " + sel.apportion(example, k) + "");
+			System.out.println("\tExample: " + pri.apportion(example, k) + "");
+			System.out.println("\tExample 1/unit: " + 1 / sel.apportion(example, k).astar + "");
+			System.out.println("\tExample: " + ce.apportion(example, k) + "");
 			System.out.println(
-				  "sel.unitSize(example,k) == ce.unitSize(example,k) = " + (sel.unitSize(
-						 example, k) == ce.unitSize(example, k)));
-			allEqual &= pri.unitSize(example, k) == ce.unitSize(example, k);
-			allEqual &= pri.unitSize(example, k) == sel.unitSize(example, k);
+				  "sel.unitSize(example,k) == ce.unitSize(example,k) = " + (sel.apportion(
+                          example, k) == ce.apportion(example, k)));
+			allEqual &= pri.apportion(example, k) == ce.apportion(example, k);
+			allEqual &= pri.apportion(example, k) == sel.apportion(example, k);
 		}
 		System.out.println("allEqual = " + allEqual);
 	}

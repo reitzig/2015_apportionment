@@ -15,6 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package de.unikl.cs.agak.appportionment.methods;
 
+import de.unikl.cs.agak.appportionment.Apportionment;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,8 +29,23 @@ public class SelectAStarNaive extends LinearApportionmentMethod {
 		super(alpha, beta);
 	}
 
-	@Override
-    public double unitSize(double[] population, int k) {
+    @Override
+    public Apportionment apportion(double[] votes, int k) {
+        // Compute $a^*$
+        final double astar = unitSize(votes, k);
+
+        // Derive seats
+        final int[] seats = new int[votes.length];
+        for (int i = 0; i < votes.length; i++) {
+            seats[i] = new Double(Math.floor(deltaInv(votes[i] * astar))).intValue() + 1;
+        }
+
+        // TODO resolve ties? May assign more than k seats now
+
+        return new Apportionment(seats, astar);
+    }
+
+    private double unitSize(double[] population, int k) {
 		final int n = population.length;
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;
