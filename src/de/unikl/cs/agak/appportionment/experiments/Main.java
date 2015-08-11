@@ -13,6 +13,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+package de.unikl.cs.agak.appportionment.experiments;
+
+import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.methods.*;
+import edu.princeton.cs.introcs.Stopwatch;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
@@ -42,12 +47,12 @@ class Main {
 
 
 		for (int i = 0; i < 5; ++i)
-			runAllOn(ApportionmentInstance.exponentialRandomInstance(30, new ApportionmentInstance.KFactory(5)), 1, 0);
+			runAllOn(ApportionmentInstanceFactory.exponentialRandomInstance(30, new ApportionmentInstanceFactory.KFactory(5)), 1, 0);
 
 //		runAlgsOn(Instance.uniformRandomInstance(1000000),
-//			  Arrays.<LinearApportionment>asList(new SelectAStarNoOptimalityCheck(2, 1)));
+//			  Arrays.<LinearApportionmentMethod>asList(new SelectAStarNoOptimalityCheck(2, 1)));
 //		runAlgsOn(Instance.uniformRandomInstance(100000),
-//			  Arrays.<LinearApportionment>asList(new ChengEppstein(2, 1)));
+//			  Arrays.<LinearApportionmentMethod>asList(new ChengEppstein(2, 1)));
 
 //		printPeakMemoryUsage();
 	}
@@ -88,13 +93,14 @@ class Main {
 	private static void warmup() {// warm up JIT
 		for (int i = 0; i < 12000; ++i) {
 			final ApportionmentInstance
-				  instance = ApportionmentInstance.uniformRandomInstance(30, new ApportionmentInstance.KFactory(5,10));
-			new SelectAStarNaive(2, 1).unitSize(instance.population, 33);
-			new SelectAStarWithOptimalityCheck(2, 1).unitSize(instance.population, 33);
-			new SelectAStar(2, 1).unitSize(instance.population, 33);
-			new AStarChengEppstein(2, 1).unitSize(instance.population, 33);
-			new HighestAveragesPQ(2, 1).unitSize(instance.population, 33);
-			new HighestAveragesLS(2, 1).unitSize(instance.population, 33);
+				  instance = ApportionmentInstanceFactory.uniformRandomInstance(30, new ApportionmentInstanceFactory.KFactory(5,10));
+			new SelectAStarNaive(2, 1).apportion(instance.votes, 33);
+			new SelectAStarWithOptimalityCheck(2, 1).apportion(instance.votes, 33);
+			new SelectAStar(2, 1).apportion(instance.votes, 33);
+			new AStarChengEppstein(2, 1).apportion(instance.votes, 33);
+			new IterativeDMPQ(2, 1).apportion(instance.votes, 33);
+			new IterativeDMLS(2, 1).apportion(instance.votes, 33);
+			new PukelsheimPQ(2, 1).apportion(instance.votes, 33);
 		}
 
 		System.out.println("Warmup finished");
@@ -135,50 +141,53 @@ class Main {
 
 	private static void runAllOn(ApportionmentInstance instance, double alpha, double beta)
 		  throws Exception {
-		List<LinearApportionment> algs = Arrays.asList(
+		List<LinearApportionmentMethod> algs = Arrays.asList(
 		  new SelectAStarNaive(alpha, beta), 
 		  new SelectAStarWithOptimalityCheck(alpha, beta), 
 		  new AStarChengEppstein(alpha, beta),
 			new SelectAStar(alpha, beta),
-			new HighestAveragesLS(alpha, beta),
-			new HighestAveragesPQ(alpha, beta));
+			new IterativeDMPQ(alpha, beta),
+			new IterativeDMPQ(alpha, beta),
+			new PukelsheimPQ(alpha, beta));
 		runAlgsOn(instance, algs);
 	}
 
 	private static void runLinearAlgsOn(ApportionmentInstance instance, double alpha, double beta)
 		  throws Exception {
-		List<LinearApportionment> algs = Arrays.asList(
+		List<LinearApportionmentMethod> algs = Arrays.asList(
 		  new SelectAStarWithOptimalityCheck(alpha, beta),
 		  new AStarChengEppstein(alpha, beta), 
 		  new SelectAStar(alpha, beta),
-			new HighestAveragesLS(alpha, beta),
-			new HighestAveragesPQ(alpha, beta));
+			new IterativeDMLS(alpha, beta),
+			new IterativeDMPQ(alpha, beta),
+			new PukelsheimPQ(alpha, beta));
 		runAlgsOn(instance, algs);
 	}
 
 	private static void runAlgsOn(final ApportionmentInstance instance,
-		  final List<LinearApportionment> algs) throws Exception {
-		Map<LinearApportionment, Double> unitSizes =
-			  new HashMap<LinearApportionment, Double>(8);
-		for (final LinearApportionment alg : algs) {
+		  final List<LinearApportionmentMethod> algs) throws Exception {
+		Map<LinearApportionmentMethod, int[]> apportionments =
+			  new HashMap<LinearApportionmentMethod, int[]>(8);
+		for (final LinearApportionmentMethod alg : algs) {
 
 			try {
 				final Stopwatch stopwatch = new Stopwatch();
-				final double unitSize = alg.unitSize(instance.population, instance.k);
+				final int[] seats = alg.apportion(instance.votes, instance.k);
 				System.out.println(alg + " took " + stopwatch.elapsedTime() + "s.");
 
-				unitSizes.put(alg, unitSize);
+				apportionments.put(alg, seats);
 			} catch (Exception e) {
 				System.out.println("instance = " + instance);
 				throw e;
 			}
 		}
-		System.out.println("unitSizes = " + unitSizes);
-		// all equal?
-		Double value = null;
-		for (final LinearApportionment alg : algs) {
-			if (value == null) value = unitSizes.get(alg);
-			else if (!value.equals(unitSizes.get(alg))) {
+		System.out.println("apportionments = " + apportionments);
+		// all equal? 
+		// TODO does not make sense anymore
+		int[] value = null;
+		for (final LinearApportionmentMethod alg : algs) {
+			if (value == null) value = apportionments.get(alg);
+			else if (!value.equals(apportionments.get(alg))) {
 				System.out.println("\tNOT ALL EQUAL!");
 				System.exit(1);
 			}
@@ -197,9 +206,10 @@ class Main {
 //		int k = 6;
 			System.out.println("\n\nk = " + k);
 
-			LinearApportionment ce = new AStarChengEppstein(alpha, beta);
-			LinearApportionment sel = new SelectAStarWithOptimalityCheck(alpha, beta);
-			LinearApportionment pri = new SelectAStarNaive(alpha, beta);
+			LinearApportionmentMethod ce = new AStarChengEppstein(alpha, beta);
+			LinearApportionmentMethod sel = new SelectAStarWithOptimalityCheck(alpha, beta);
+			LinearApportionmentMethod pri = new SelectAStarNaive(alpha, beta);
+			LinearApportionmentMethod puk = new PukelsheimPQ(alpha, beta);
 			System.out.println("\tExample: " + sel.unitSize(example, k) + "");
 			System.out.println("\tExample: " + pri.unitSize(example, k) + "");
 			System.out.println("\tExample 1/unit: " + 1 / sel.unitSize(example, k) + "");

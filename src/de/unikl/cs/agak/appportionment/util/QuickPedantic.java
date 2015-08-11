@@ -1,6 +1,12 @@
 /* Taken with thanks from http://algs4.cs.princeton.edu/23quicksort/QuickPedantic.java.html
  * and re-released as per GPL 3.0, cf. Q + A on http://algs4.cs.princeton.edu/code/ */
 
+package de.unikl.cs.agak.appportionment.util;
+
+import edu.princeton.cs.introcs.StdIn;
+import edu.princeton.cs.introcs.StdOut;
+import edu.princeton.cs.introcs.StdRandom;
+
 /*************************************************************************
  *  Compilation:  javac QuickPedantic.java
  *  Execution:    java QuickPedantic < input.txt

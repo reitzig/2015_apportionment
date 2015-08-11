@@ -13,6 +13,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+package de.unikl.cs.agak.appportionment.util;
+
+import edu.princeton.cs.introcs.StdRandom;
+
 /**
  * Rank selection algorithms as seen in
  * <a href="http://algs4.cs.princeton.edu/23quicksort/QuickPedantic.java.html">QuickPedantic</a>
@@ -21,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @author Sebastian Wild (s_wild@cs.uni-kl.de)
  */
-public class RankSelectionUtil {
+public class RankSelection {
 	public static double median(double[] a) {
 		return a.length == 1 ? a[0] : select(a, a.length / 2 - 1);
 	}

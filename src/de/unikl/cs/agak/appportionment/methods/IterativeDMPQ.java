@@ -13,17 +13,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+package de.unikl.cs.agak.appportionment.methods;
+
 import java.util.PriorityQueue;
 import java.util.Comparator;
 
-public class HighestAveragesPQ extends LinearApportionment {
+public class IterativeDMPQ extends LinearApportionmentMethod {
 
-	public HighestAveragesPQ(final double alpha, final double beta) {
+	public IterativeDMPQ(final double alpha, final double beta) {
 		super(alpha, beta);
 	}
 
-  @Override 
-  double unitSize(final double[] population, int k) {
+  @Override
+  public double unitSize(final double[] population, int k) {
     // Initialize heap
     final PriorityQueue<Entry> heap = new PriorityQueue<Entry>(population.length,     
       new Comparator<Entry>() {
@@ -35,7 +37,7 @@ public class HighestAveragesPQ extends LinearApportionment {
       
     // Seed heap with initial values
     for ( int i=0; i<population.length; i++ ) {
-      heap.add(new Entry(i, d(0)/population[i]));
+      heap.add(new Entry(i, d(0) / population[i]));
     }
     
     // Subsequently assign seats
@@ -44,13 +46,43 @@ public class HighestAveragesPQ extends LinearApportionment {
       final Entry e = heap.poll();
       final int i = e.index;
       seats[i]++;
-      e.value = d(seats[i])/population[i];
+      e.value = d(seats[i]) / population[i];
       heap.add(e);
       k--;
     }
     
     // Next element determines the last seat
     return heap.peek().value; 
+  }
+  
+  @Override
+  public int[] apportion(final double[] population, int k) {
+    // Initialize heap
+    final PriorityQueue<Entry> heap = new PriorityQueue<Entry>(population.length,     
+      new Comparator<Entry>() {
+        @Override
+        public int compare(final Entry e1, final Entry e2) {
+          return Double.compare(e1.value, e2.value);
+        }
+      });
+      
+    // Seed heap with initial values
+    for ( int i=0; i<population.length; i++ ) {
+      heap.add(new Entry(i, d(0) / population[i]));
+    }
+    
+    // Subsequently assign seats
+    final int[] seats = new int[population.length];
+    while ( k > 0 ) {
+      final Entry e = heap.poll();
+      final int i = e.index;
+      seats[i]++;
+      e.value = d(seats[i]) / population[i];
+      heap.add(e);
+      k--;
+    }
+    
+    return seats;
   }
   
   private static class Entry {

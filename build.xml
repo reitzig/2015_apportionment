@@ -26,15 +26,15 @@
   </target>
 
   <target name="test" depends="compile">
-    <java classname="Main" dir="${build}" fork="true" output="developer_test_report"/>
+    <java classname="de.unikl.cs.agak.appportionment.experiments.Main" dir="${build}" fork="true" output="developer_test_report"/>
   </target>
 
   <target name="run" depends="compile">
     <tstamp>
       <format property="TODAY_DE" pattern="yyMMddHHmmss"/>
     </tstamp>
-    <java classname="RunningTimeMain" fork="true" dir=".">
-      <arg line="rw,ce,hapq,hals 25,50,75,100 5,10 10000 100 ${TODAY_DE} uniform 2 1"/>
+    <java classname="de.unikl.cs.agak.appportionment.experiments.RunningTimeMain" fork="true" dir=".">
+      <arg line="rw,ce,dmpq,dmls,pupq 25,50,75,100 5,10 10000 100 ${TODAY_DE} uniform 2 1"/>
       <classpath>
         <pathelement path="${build}"/>
         <pathelement path="${java.class.path}"/>

@@ -13,12 +13,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+package de.unikl.cs.agak.appportionment.experiments;
+
+import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.methods.*;
+import de.unikl.cs.agak.appportionment.util.SedgewickRandom;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -43,7 +48,7 @@ public class RunningTimeMain {
 		}
 
 		List<Integer> ns = Arrays.asList(10, 20);
-		ApportionmentInstance.KFactory k = new ApportionmentInstance.KFactory(5,10);
+		ApportionmentInstanceFactory.KFactory k = new ApportionmentInstanceFactory.KFactory(5,10);
 		int repetitions = 1;
 		int inputsPerN = 1;
 		String inputType = "uniform";
@@ -61,10 +66,10 @@ public class RunningTimeMain {
 		if (args.length >= 3) {
 		  final String[] ksArray = args[2].split("\\s*,\\s*");
 			if ( ksArray.length == 1 ) {
-			  k = new ApportionmentInstance.KFactory(Integer.parseInt(ksArray[0]));
+			  k = new ApportionmentInstanceFactory.KFactory(Integer.parseInt(ksArray[0]));
 			}
 			else if ( ksArray.length == 2 ) {
-			  k = new ApportionmentInstance.KFactory(Integer.parseInt(ksArray[0]), Integer.parseInt(ksArray[1]));
+			  k = new ApportionmentInstanceFactory.KFactory(Integer.parseInt(ksArray[0]), Integer.parseInt(ksArray[1]));
 			}
 		}
 		if (args.length >= 4) {
@@ -112,9 +117,10 @@ public class RunningTimeMain {
 
 		warmup(algoNames, alpha, beta);
 
-		final String name = "votes=" + inputType + 
-		                    "-N=" + ns.toString().replaceAll("\\s+","") + 
+		final String name = "N=" + ns.toString().replaceAll("\\s+","") + 
 		                    "-K=" + k.toString() + 
+		                    "-votes=" + inputType + 
+		                    "-(alpha,beta)=(" + alpha + "," + beta + ")" +
 		                    "-reps=" + repetitions + 
 		                    "-perN=" + inputsPerN + 
 		                    "-seed=" + seed;
@@ -132,8 +138,8 @@ public class RunningTimeMain {
 			out.write(SEP);
 			out.write("input-nr");
 			out.write(SEP);
-			out.write("1/unit-size");
-			out.write(SEP);
+			//out.write("1/unit-size");
+			//out.write(SEP);
 			out.write("repetitions");
 			out.write(SEP);
 			out.write("total-ms");
@@ -167,7 +173,7 @@ public class RunningTimeMain {
 
 			for (final String algoName : algoNames) {
 				final SedgewickRandom random = new SedgewickRandom(seed);
-				final LinearApportionment alg = algoInstance(algoName, alpha, beta);
+				final LinearApportionmentMethod alg = algoInstance(algoName, alpha, beta);
 				System.out.println("\n\n\nStarting with algo " + algoName + now());
 				for (final int n : ns) {
 					System.out.println("\tUsing n=" + n + now());
@@ -178,24 +184,27 @@ public class RunningTimeMain {
 						System.out.println("\t\tinputNr=" + inputNr + now());
 						final ApportionmentInstance input;
 						if ("uniform".equals(inputType)) {
-							input = ApportionmentInstance.uniformRandomInstance(random, n, k);
+							input = ApportionmentInstanceFactory.uniformRandomInstance(random, n, k);
 						} else if ("exponential".equals(inputType)) {
-							input = ApportionmentInstance.exponentialRandomInstance(random,n,k);
+							input = ApportionmentInstanceFactory.exponentialRandomInstance(random,n,k);
 						} else {
 							throw new IllegalArgumentException(
 								  "Unknown input type " + inputType);
 						}
-						double unitSize = 0;
+						int[] seats = null;
 
 						final long startTime = System.nanoTime();
 						for (int r = 0; r < repetitions; ++r) {
-							unitSize = alg.unitSize(input.population, input.k);
+							seats = alg.apportion(input.votes, input.k);
 						}
 						final long endTime = System.nanoTime();
 						final long nanos = endTime - startTime;
 						final double millis = nanos / 1000. / 1000;
 						final double perRunMillis = millis / repetitions;
             sizeTotalRunMillis += perRunMillis;
+
+            // do something to call is not optimized away
+            for ( int s : seats ) { s -= seats[0]; }
 
 						out.write(algoName); //"algo"
 						out.write(SEP);
@@ -205,8 +214,8 @@ public class RunningTimeMain {
 						out.write(SEP);
 						out.write(String.valueOf(inputNr)); //"input-nr"
 						out.write(SEP);
-						out.write(String.valueOf(1 / unitSize)); //"1/unit-size"
-						out.write(SEP);
+						//out.write(String.valueOf(1 / unitSize)); //"1/unit-size"
+						//out.write(SEP);
 						out.write(String.valueOf(repetitions)); //"repetitions"
 						out.write(SEP);
 						out.write(String.valueOf(millis)); // "total-time"
@@ -262,7 +271,7 @@ public class RunningTimeMain {
 			int i = 0;
 			for (final String algoName : algoNames) {
 			  if ( i > 0 ) out.write(", "); else i++;
-			  out.write("\"<(grep -e " + algoName + "[[:space:]] avgtimes-" + name + ".tab)\" using 2:3 ti \"" + algoName + "\"");
+			  out.write("\"<(grep -e " + algoName + "[[:space:]] \\\"avgtimes-" + name + ".tab\\\")\" using 2:3 ti \"" + algoName + "\"");
 			}
 			out.newLine(); out.newLine();
 			
@@ -272,14 +281,14 @@ public class RunningTimeMain {
 			int j = 0;
 			for (final String algoName : algoNames) {
 			  if ( j > 0 ) out.write(", "); else j++;
-			  out.write("\"<(grep -e " + algoName + "[[:space:]] avgtimes-" + name + ".tab)\" using 2:4 ti \"" + algoName + "\"");
+			  out.write("\"<(grep -e " + algoName + "[[:space:]] \\\"avgtimes-" + name + ".tab\\\")\" using 2:4 ti \"" + algoName + "\"");
 			}
 			out.newLine(); out.newLine();
 			
 			// One plot with all points per algorithm
 			for (final String algoName : algoNames) {
 			  out.write("set output \"times-" + algoName + "-" + name + ".png\""); out.newLine();
-  			out.write("plot \"<(grep -e " + algoName + "[[:space:]] times-" + name + ".tab)\" using 2:8 ti \"" + algoName + "\""); 
+  			out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"times-" + name + ".tab\\\")\" using 2:8 ti \"" + algoName + "\"");
   			out.newLine(); out.newLine();
 			}
     } finally {
@@ -301,17 +310,17 @@ public class RunningTimeMain {
 		
 		for (int i = 0; i < 12000; ++i) {
 			final ApportionmentInstance instance =
-				  ApportionmentInstance.uniformRandomInstance(30, new ApportionmentInstance.KFactory(5));
+                    ApportionmentInstanceFactory.uniformRandomInstance(30, new ApportionmentInstanceFactory.KFactory(5));
 			for (final String algoName : algoNames) {
-				algoInstance(algoName, alpha, beta).unitSize(instance.population, 33);
+				algoInstance(algoName, alpha, beta).apportion(instance.votes, 33);
 			}
 		}
 
 		System.out.println("Warumup finished" + now());
 	}
 
-	public static Map<String, Class<? extends LinearApportionment>> algorithms =
-		  new LinkedHashMap<String, Class<? extends LinearApportionment>>();
+	public static Map<String, Class<? extends LinearApportionmentMethod>> algorithms =
+		  new LinkedHashMap<String, Class<? extends LinearApportionmentMethod>>();
 	public static Map<String, String> abbreviations = new HashMap<String, String>();
 
 	static {
@@ -319,18 +328,20 @@ public class RunningTimeMain {
 		algorithms.put("SelectAstarOptimalityCheck", SelectAStarWithOptimalityCheck.class);
 		algorithms.put("SelectAstar", SelectAStar.class);
 		algorithms.put("AStarChengEppstein", AStarChengEppstein.class);
-		algorithms.put("HighestAveragesLS", HighestAveragesLS.class);
-		algorithms.put("HighestAveragesPQ", HighestAveragesPQ.class);
+		algorithms.put("IterativeDMLS", IterativeDMLS.class);
+		algorithms.put("IterativeDMPQ", IterativeDMPQ.class);
+		algorithms.put("PukelsheimPQ", PukelsheimPQ.class);
 
 		abbreviations.put("naive", "SelectAstarNaive");
 		abbreviations.put("n", "SelectAstarNaive");
 		abbreviations.put("rw", "SelectAstar");
 		abbreviations.put("ce", "AStarChengEppstein");
-		abbreviations.put("hapq", "HighestAveragesPQ");
-		abbreviations.put("hals", "HighestAveragesLS");
+		abbreviations.put("dmpq", "IterativeDMPQ");
+		abbreviations.put("dmls", "IterativeDMLS");
+		abbreviations.put("pupq", "PukelsheimPQ");
 	}
 
-	public static LinearApportionment algoInstance(String name, double alpha, double beta)
+	public static LinearApportionmentMethod algoInstance(String name, double alpha, double beta)
 		  throws IllegalAccessException, InstantiationException, NoSuchMethodException,
 		  InvocationTargetException {
 		return algorithms.get(name).getConstructor(double.class, double.class).newInstance(

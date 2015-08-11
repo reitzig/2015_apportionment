@@ -13,8 +13,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+package de.unikl.cs.agak.appportionment.methods;
+
+import de.unikl.cs.agak.appportionment.util.RankSelection;
 
 import java.util.*;
+
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
 
 /**
  * Implements the algorithm presented in
@@ -26,13 +31,13 @@ import java.util.*;
  * </p>
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-public class AStarChengEppstein extends LinearApportionment {
+public class AStarChengEppstein extends LinearApportionmentMethod {
   public AStarChengEppstein(double alpha, double beta) {
     super(alpha, beta);
   }
 
   @Override
-  double unitSize(double[] population, int k) {
+  public double unitSize(double[] population, int k) {
     // Initialize sequences
     // TODO move to 𝒜, ξ? Seems to skrew with most IDEs, though.
     Collection<Sequence> A = new LinkedList<Sequence>();
@@ -61,7 +66,7 @@ public class AStarChengEppstein extends LinearApportionment {
       for ( Sequence a : A ) {
         x_As[i++] = a.x_A();
       }
-      double x = RankSelectionUtil.median(x_As);
+      double x = RankSelection.median(x_As);
       
       // Lines 4-9
       Collection<Sequence> Anew = new LinkedList<Sequence>();
@@ -98,7 +103,7 @@ public class AStarChengEppstein extends LinearApportionment {
     while ( true ) {
       // Line 3
       double[] L = L(u, A);
-      double x = RankSelectionUtil.median(L);
+      double x = RankSelection.median(L);
       
       // Lines 4-12
       if ( r(x,A) >= k ) {
@@ -142,7 +147,7 @@ public class AStarChengEppstein extends LinearApportionment {
     boolean singleValue;
     do {
       // Line 4
-      double x = RankSelectionUtil.median(G);
+      double x = RankSelection.median(G);
       
       // Literal translation of lines 5-10
       if ( r(x,A) < k ) {

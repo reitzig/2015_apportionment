@@ -13,16 +13,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+package de.unikl.cs.agak.appportionment.methods;
+
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class SelectAStar extends LinearApportionment {
+import de.unikl.cs.agak.appportionment.util.RankSelection;
+
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
+
+
+public class SelectAStar extends LinearApportionmentMethod {
 
 	public SelectAStar(final double alpha, final double beta) {
 		super(alpha, beta);
 	}
 
-	@Override double unitSize(double[] population, int k) {
+	@Override
+    public double unitSize(double[] population, int k) {
 		final int n = population.length;
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;
@@ -79,7 +87,7 @@ public class SelectAStar extends LinearApportionment {
 //		System.out.println("k_hat = " + k_hat);
 
 		// Selection algorithm is zero-based!
-		return RankSelectionUtil.select(A_hat, A_hat_size - 1, k_hat - 1);
+		return RankSelection.select(A_hat, A_hat_size - 1, k_hat - 1);
 	}
 
 }

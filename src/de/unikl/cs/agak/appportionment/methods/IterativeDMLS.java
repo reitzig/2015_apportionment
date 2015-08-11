@@ -13,18 +13,20 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-public class HighestAveragesLS extends LinearApportionment {
+package de.unikl.cs.agak.appportionment.methods;
 
-	public HighestAveragesLS(final double alpha, final double beta) {
+public class IterativeDMLS extends LinearApportionmentMethod {
+
+	public IterativeDMLS(final double alpha, final double beta) {
 		super(alpha, beta);
 	}
 
-  @Override 
-  double unitSize(final double[] population, int k) {
+  @Override
+  public double unitSize(final double[] population, int k) {
     // Initialize current values
     final double[] values = new double[population.length];
       
-    // Seed heap with initial values
+    // Seed list with initial values
     for ( int i=0; i<population.length; i++ ) {
       values[i] = d(0) / population[i];
     }
@@ -40,7 +42,7 @@ public class HighestAveragesLS extends LinearApportionment {
       }
       
       seats[imin]++;     
-      values[imin] = d(seats[imin])/population[imin];
+      values[imin] = d(seats[imin]) / population[imin];
       k--;
     }
     
@@ -50,5 +52,33 @@ public class HighestAveragesLS extends LinearApportionment {
       if ( values[i] < values[imin] ) imin = i;
     }
     return values[imin]; 
+  }
+  
+  @Override
+  public int[] apportion(final double[] population, int k) {
+    // Initialize current values
+    final double[] values = new double[population.length];
+      
+    // Seed list with initial values
+    for ( int i=0; i<population.length; i++ ) {
+      values[i] = d(0) / population[i];
+    }
+    
+    // Subsequently assign seats
+    final int[] seats = new int[population.length];
+    int imin = 0;
+    while ( k > 0 ) {      
+      // Find index with maximum value
+      imin = 0;
+      for ( int i=1; i<values.length; i++ ) {
+        if ( values[i] < values[imin] ) imin = i;
+      }
+      
+      seats[imin]++;     
+      values[imin] = d(seats[imin]) / population[imin];
+      k--;
+    }
+    
+    return seats;
   }
 }

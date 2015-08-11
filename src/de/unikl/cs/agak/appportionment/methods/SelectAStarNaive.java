@@ -13,19 +13,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+package de.unikl.cs.agak.appportionment.methods;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SelectAStarNaive extends LinearApportionment {
+public class SelectAStarNaive extends LinearApportionmentMethod {
 
 	public SelectAStarNaive(final double alpha, final double beta) {
 		super(alpha, beta);
 	}
 
-	@Override double unitSize(double[] population, int k) {
+	@Override
+    public double unitSize(double[] population, int k) {
 		final int n = population.length;
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;

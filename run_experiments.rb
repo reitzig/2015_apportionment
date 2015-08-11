@@ -122,5 +122,5 @@ File.open("experiments.log", "w") { |f|
 
 puts "Plotting..."
 Dir["*.gp"].each { |gp|
-  `gnuplot #{gp}`
+  `gnuplot "#{gp}"`
 }
