@@ -21,16 +21,16 @@ contains an implementation of the algorithm we have presented in
 
 Furthermore, we implement the jump-and-step algorithm from
 
-> Pukelsheim, F.
-> Proportional Representation
+> Pukelsheim, F.  
+> Proportional Representation  
 > Springer, 2014
 
 in [`PukelsheimPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SelectAStar.java).
 
 Finally, we give implementations of the method-defining algorithm using
 priority queues resp. a linear scan for finding maxima in
-[`IterativeDMPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/HighestAveragesPQ.java)
-and [`IterativeDMLS.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/HighestAveragesLS.java),
+[`IterativeDMPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/IterativeDMPQ.java)
+and [`IterativeDMLS.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/IterativeDMLS.java),
 respectively.
 
 The core algorithms start in the respective implementations of method `unitSize` resp. `apportion`.
