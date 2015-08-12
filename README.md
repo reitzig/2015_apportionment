@@ -1,37 +1,37 @@
 ## Linear-Time Algorithms for Proportional Apportionment
 
 This repository contains implementations of algorithms for proportional 
-apportionment from two separate articles. Inspect and use at your own risk.
+apportionment with divisor methods. Inspect and use at your own risk.
 
-In [`AStarChengEppstein.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/AStarChengEppstein.java)
-we provide an implementation of the algorithm proposed in
+ * In [`AStarChengEppstein.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/AStarChengEppstein.java)
+  we provide an implementation of the algorithm proposed in
 
-> Cheng, Z. and Eppstein, D.  
-> [Linear-time Algorithms for Proportional Apportionment](http://link.springer.com/chapter/10.1007/978-3-319-13075-0_46)  
-> In: International Symposium on Algorithms and Computation (ISAAC) 2014.  
-> Springer (2014)  
-> [[preprint](http://arxiv.org/abs/1409.2603) (v1,2014)]
+  > Cheng, Z. and Eppstein, D.  
+  > [Linear-time Algorithms for Proportional  Apportionment](http://link.springer.com/chapter/10.1007/978-3-319-13075-0_46)  
+  > In: International Symposium on Algorithms and Computation (ISAAC) 2014.  
+  > Springer (2014)  
+  > [[preprint](http://arxiv.org/abs/1409.2603) (v1,2014)]
 
-File [`SelectAStar.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SelectAStar.java)
-contains an implementation of the algorithm we have presented in
+ * File [`SelectAStar.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SelectAStar.java)
+  contains an implementation of the algorithm we have presented in
 
-> Wild, S. and Reitzig, R.  
-> A Simple and Fast Linear-Time Algorithm for Proportional Apportionment  
-> [[preprint](http://arxiv.org/abs/1504.06475) (v1,2015)]
+  > Wild, S. and Reitzig, R.  
+  > A Simple and Fast Linear-Time Algorithm for Proportional Apportionment  
+  > [[preprint](http://arxiv.org/abs/1504.06475) (v1,2015)]
 
-Furthermore, we implement the jump-and-step algorithm from
+ * Furthermore, we implement the jump-and-step algorithm from
 
-> Pukelsheim, F.  
-> Proportional Representation  
-> Springer, 2014
+  > Pukelsheim, F.  
+  > Proportional Representation  
+  > Springer, 2014
 
-in [`PukelsheimPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SelectAStar.java).
+  in [`PukelsheimPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SelectAStar.java).
 
-Finally, we give implementations of the method-defining algorithm using
-priority queues resp. a linear scan for finding maxima in
-[`IterativeDMPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/IterativeDMPQ.java)
-and [`IterativeDMLS.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/IterativeDMLS.java),
-respectively.
+ * Finally, we give implementations of the naive algorithm using
+  priority queues resp. a linear scan for finding maxima in
+  [`IterativeDMPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/IterativeDMPQ.java)
+  and [`IterativeDMLS.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/IterativeDMLS.java),
+  respectively.
 
 The core algorithms start in the respective implementations of method `unitSize` resp. `apportion`.
 
