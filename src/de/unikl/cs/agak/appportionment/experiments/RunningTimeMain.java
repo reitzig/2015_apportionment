@@ -41,6 +41,22 @@ public class RunningTimeMain {
 
     static String SEP = "\t";
 
+    /**
+     * Writes a line of strings separated by <code>SEP</code> to the given stream, and flushes it.
+     * @param target Stream to write to.
+     * @param line   List of values to write
+     * @throws IOException
+     */
+    static void writeSeparatedLine(BufferedWriter target, String... line) throws IOException {
+        int i = 0;
+        for ( String item : line ) {
+            if ( i > 0 ) { target.write(SEP); } else { i++; }
+            target.write(item);
+        }
+        target.newLine();
+        target.flush();
+    }
+
     public static void main(String[] args)
             throws InvocationTargetException, NoSuchMethodException, InstantiationException,
             IllegalAccessException, IOException {
@@ -50,6 +66,7 @@ public class RunningTimeMain {
             System.exit(42);
         }
 
+        // Initialize defaults
         List<Integer> ns = Arrays.asList(10, 20);
         ApportionmentInstanceFactory.KFactory k = new ApportionmentInstanceFactory.KFactory(5, 10);
         int repetitions = 1;
@@ -58,6 +75,7 @@ public class RunningTimeMain {
         double alpha = 1, beta = 1;
         long seed = System.currentTimeMillis();
 
+        // Parse command-line parameters
         final String[] algosArray = args[0].split("\\s*,\\s*");
         if (args.length >= 2) {
             final String[] nsArray = args[1].split("\\s*,\\s*");
@@ -126,57 +144,24 @@ public class RunningTimeMain {
                 "-reps=" + repetitions +
                 "-perN=" + inputsPerN +
                 "-seed=" + seed;
-        //new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
 
+        // Perform experiments
         BufferedWriter out = null;
         BufferedWriter avgOut = null;
         try {
             out = new BufferedWriter(new FileWriter("times-" + name + ".tab"));
-            out.write("algo");
-            out.write(SEP);
-            out.write("n");
-            out.write(SEP);
-            out.write("k");
-            out.write(SEP);
-            out.write("input-nr");
-            out.write(SEP);
-            //out.write("1/unit-size");
-            //out.write(SEP);
-            out.write("repetitions");
-            out.write(SEP);
-            out.write("total-ms");
-            out.write(SEP);
-            out.write("single-run-ms");
-            out.write(SEP);
-            out.write("single-run-ms/n");
-            out.write(SEP);
-            out.write("input-type");
-            out.write(SEP);
-            out.write("alpha");
-            out.write(SEP);
-            out.write("beta");
-            out.write(SEP);
-            out.write("seed");
-            out.write(SEP);
-            out.write("ns");
-            out.newLine();
-            out.flush();
+            writeSeparatedLine(out, "algo", "n", "k", "input-nr", "1/unit-size", "repetitions",
+                "total-ms", "single-run-ms", "single-run-ms/n",
+                "input-type", "alpha", "beta", "seed", "ns");
 
             avgOut = new BufferedWriter(new FileWriter("avgtimes-" + name + ".tab"));
-            avgOut.write("algo");
-            avgOut.write(SEP);
-            avgOut.write("n");
-            avgOut.write(SEP);
-            avgOut.write("avg-run-ms");
-            avgOut.write(SEP);
-            avgOut.write("avg-run-ms/n");
-            avgOut.newLine();
-            avgOut.flush();
+            writeSeparatedLine(avgOut, "algo", "n", "avg-run-ms", "avg-run-ms/n");
 
             for (final String algoName : algoNames) {
                 final SedgewickRandom random = new SedgewickRandom(seed);
                 final LinearApportionmentMethod alg = algoInstance(algoName, alpha, beta);
                 System.out.println("\n\n\nStarting with algo " + algoName + now());
+
                 for (final int n : ns) {
                     System.out.println("\tUsing n=" + n + now());
 
@@ -205,53 +190,23 @@ public class RunningTimeMain {
                         final double perRunMillis = millis / repetitions;
                         sizeTotalRunMillis += perRunMillis;
 
-                        // do something to call is not optimized away
+                        // do something so the calls to apportion are not optimized away
                         for (int s : app.seats) {
                             s -= app.seats[0];
                         }
 
-                        out.write(algoName); //"algo"
-                        out.write(SEP);
-                        out.write(String.valueOf(n)); //"n"
-                        out.write(SEP);
-                        out.write(String.valueOf(input.k)); //"n"
-                        out.write(SEP);
-                        out.write(String.valueOf(inputNr)); //"input-nr"
-                        out.write(SEP);
-                        //out.write(String.valueOf(1 / unitSize)); //"1/unit-size"
-                        //out.write(SEP);
-                        out.write(String.valueOf(repetitions)); //"repetitions"
-                        out.write(SEP);
-                        out.write(String.valueOf(millis)); // "total-time"
-                        out.write(SEP);
-                        out.write(String.valueOf(perRunMillis)); // "single-run-ms"
-                        out.write(SEP);
-                        out.write(String.valueOf(perRunMillis / n)); // "single-run-ms/n"
-                        out.write(SEP);
-                        out.write(inputType);//"input-type"
-                        out.write(SEP);
-                        out.write(String.valueOf(alpha)); //"alpha"
-                        out.write(SEP);
-                        out.write(String.valueOf(beta));// "beta"
-                        out.write(SEP);
-                        out.write(String.valueOf(seed)); //"seed"
-                        out.write(SEP);
-                        out.write("\"" + ns.toString().replaceAll("\\s+", "") + "\""); // "ns"
-                        out.newLine();
-                        System.out.print("\33[1A\33[2K");
+                        writeSeparatedLine(out, algoName, String.valueOf(n), String.valueOf(input.k), String.valueOf(inputNr),
+                                String.valueOf(1 / app.astar), String.valueOf(repetitions), String.valueOf(millis),
+                                String.valueOf(perRunMillis), String.valueOf(perRunMillis / n), inputType,
+                                String.valueOf(alpha), String.valueOf(beta), String.valueOf(seed),
+                                "\"" + ns.toString().replaceAll("\\s+", "") + "\"");
+                        System.out.print("\33[1A\33[2K"); // Overwrite "inputNr=..." line
                     }
 
-                    avgOut.write(algoName);
-                    avgOut.write(SEP);
-                    avgOut.write(String.valueOf(n));
-                    avgOut.write(SEP);
-                    avgOut.write(String.valueOf(sizeTotalRunMillis / inputsPerN));
-                    avgOut.write(SEP);
-                    avgOut.write(String.valueOf(sizeTotalRunMillis / inputsPerN / n));
-                    avgOut.newLine();
-                    avgOut.flush();
+                    writeSeparatedLine(avgOut, algoName, String.valueOf(n),
+                            String.valueOf(sizeTotalRunMillis / inputsPerN),
+                            String.valueOf(sizeTotalRunMillis / inputsPerN / n));
                 }
-                out.flush();
             }
         } finally {
             if (out != null) {
@@ -262,47 +217,39 @@ public class RunningTimeMain {
             }
         }
 
-        // Write gnuplot script the plots the results
+        // Write gnuplot script that plots the results
         out = null;
         try {
             out = new BufferedWriter(new FileWriter("plots-" + name + ".gp"));
-            out.write("set terminal pngcairo linewidth 2;");
-            out.newLine();
-            out.write("set key top left;");
-            out.newLine();
+            out.write("set terminal pngcairo linewidth 2;"); out.newLine();
+            out.write("set key top left;"); out.newLine();
 
             // Averages per size in one plot
-            out.write("set output \"avgtimes-" + name + ".png\"");
-            out.newLine();
+            out.write("set output \"avgtimes-" + name + ".png\""); out.newLine();
             out.write("plot ");
             int i = 0;
             for (final String algoName : algoNames) {
-                if (i > 0) out.write(", ");
+                if (i > 0) { out.write(",\\"); out.newLine(); }
                 else i++;
-                out.write("\"<(grep -e " + algoName + "[[:space:]] \\\"avgtimes-" + name + ".tab\\\")\" using 2:3 ti \"" + algoName + "\"");
+                out.write("  \"<(grep -e " + algoName + "[[:space:]] \\\"avgtimes-" + name + ".tab\\\")\" using 2:3 ti \"" + algoName + "\"");
             }
-            out.newLine();
-            out.newLine();
+            out.newLine(); out.newLine();
 
             // Averages per size normalized by n in one plot
-            out.write("set output \"avgtimesNorm-" + name + ".png\"");
-            out.newLine();
+            out.write("set output \"avgtimesNorm-" + name + ".png\""); out.newLine();
             out.write("plot ");
             int j = 0;
             for (final String algoName : algoNames) {
-                if (j > 0) out.write(", ");
+                if (j > 0) { out.write(",\\"); out.newLine(); }
                 else j++;
-                out.write("\"<(grep -e " + algoName + "[[:space:]] \\\"avgtimes-" + name + ".tab\\\")\" using 2:4 ti \"" + algoName + "\"");
+                out.write("  \"<(grep -e " + algoName + "[[:space:]] \\\"avgtimes-" + name + ".tab\\\")\" using 2:4 ti \"" + algoName + "\"");
             }
-            out.newLine();
-            out.newLine();
+            out.newLine(); out.newLine();
 
             // One plot with all points per algorithm
             for (final String algoName : algoNames) {
-                out.write("set output \"times-" + algoName + "-" + name + ".png\"");
-                out.newLine();
-                out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"times-" + name + ".tab\\\")\" using 2:8 ti \"" + algoName + "\"");
-                out.newLine();
+                out.write("set output \"times-" + algoName + "-" + name + ".png\""); out.newLine();
+                out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"times-" + name + ".tab\\\")\" using 2:8 ti \"" + algoName + "\""); out.newLine();
                 out.newLine();
             }
         } finally {

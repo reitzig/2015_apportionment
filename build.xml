@@ -1,4 +1,4 @@
-<project name="apportionment" basedir="." default="compile">
+<project name="apportionment" basedir="." default="test">
   <property name="src" location="src"/>
   <property name="build" location="build"/>
   <property name="lib" location="lib/"/>
@@ -26,7 +26,7 @@
   </target>
 
   <target name="test" depends="compile">
-    <java classname="de.unikl.cs.agak.appportionment.experiments.Main" dir="${build}" fork="true" output="developer_test_report"/>
+    <java classname="de.unikl.cs.agak.appportionment.experiments.TestMain" dir="${build}" fork="true" output="developer_test_report"/>
   </target>
 
   <target name="run" depends="compile">

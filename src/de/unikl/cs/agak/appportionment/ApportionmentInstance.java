@@ -31,7 +31,7 @@ public class ApportionmentInstance {
 
     @Override
     public String toString() {
-        return "Instance(" + "population=" + Arrays.toString(votes) + ", k=" + k + ')';
+        return "Instance(n=" + votes.length + ", votes=" + Arrays.toString(votes) + ", k=" + k + ')';
     }
 }
 
