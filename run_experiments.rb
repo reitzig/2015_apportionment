@@ -106,7 +106,7 @@ Dir.chdir(dir)
 puts "Performing #{experiments.size} experiments..."
 puts "\t(Follow progress with 'tail -f #{dir}/experiments.log')"
 experiments.each { |e|
-  `java -cp ../build RunningTimeMain #{e.join(" ")} >> experiments.log`
+  `java -cp ../build de.unikl.cs.agak.appportionment.experiments.RunningTimeMain #{e.join(" ")} >> experiments.log`
   `echo "\n\n\n" >> experiments.log`
 }
 
