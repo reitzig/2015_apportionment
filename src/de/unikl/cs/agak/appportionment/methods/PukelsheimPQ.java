@@ -38,12 +38,30 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
 
   @Override
   public Apportionment apportion(final double[] votes, int k) {
-    // Compute initial assignment using guess sum(population)/k
-    final int[] seats = new int[votes.length];
-    
-    double sumPop = 0;
-    for ( double p : votes ) { sumPop += p; }
-    final double D = k / sumPop; // TODO if beta <= alpha then D = k / (sumPop + votes.length * (beta/alpha - 0.5))
+      // Compute initial assignment using guess sum(population)/k
+      final int[] seats = new int[votes.length];
+
+      double sumPop = 0;
+      for (double p : votes) {
+          sumPop += p;
+      }
+
+      final double D;
+      if ( beta <= alpha ) {
+          /* In this case, we have a stationary divisor method and
+           * can use Pukelsheim's recommended divisor (cf section 6.1),
+           * resp. it's reciprocal.
+           * Note that r = alpha/beta follows from
+           *    s(n+1) = d_n = alpha * n + beta
+           * which normalizes to
+           *    s(n) = n - 1 + beta/alpha.
+           */
+          D = (k  + votes.length * (beta/alpha - 0.5)) / (sumPop);
+      }
+      else {
+          // Fallback to the universal estimator
+          D = k / sumPop;
+      }
     
     for ( int i=0; i<votes.length; i++ ) {
       seats[i] = (int) Math.floor(deltaInv(votes[i] * D)) + 1; // TODO correct?
