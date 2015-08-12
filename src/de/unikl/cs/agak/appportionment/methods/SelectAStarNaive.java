@@ -40,16 +40,16 @@ public class SelectAStarNaive extends LinearApportionmentMethod {
             seats[i] = new Double(Math.floor(deltaInv(votes[i] * astar))).intValue() + 1;
         }
 
-        // TODO resolve ties? May assign more than k seats now
+        // TODO resolve ties? May assign less than k seats now
 
         return new Apportionment(seats, astar);
     }
 
-    private double unitSize(double[] population, int k) {
-		final int n = population.length;
+    private double unitSize(double[] votes, int k) {
+		final int n = votes.length;
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;
-		for (double p : population) {
+		for (double p : votes) {
 			if (p > maxPop) maxPop = p;
 		}
 		double x_overbar = d(k) / maxPop; // clearly suboptimal and feasible
@@ -57,7 +57,7 @@ public class SelectAStarNaive extends LinearApportionmentMethod {
 
 		Collection<Integer> I_x_overbar = new LinkedList<Integer>();
 		for (int i = 0; i < n; ++i) {
-			if (population[i] > d(0) / x_overbar) {
+			if (votes[i] > d(0) / x_overbar) {
 				I_x_overbar.add(i);
 			}
 		}
@@ -65,7 +65,7 @@ public class SelectAStarNaive extends LinearApportionmentMethod {
 		List<Double> A = new ArrayList<Double>();
 
 		for (int i : I_x_overbar) {
-			double v_i = population[i];
+			double v_i = votes[i];
 			for (int j = 0; j <= k; ++j) {
 				A.add(d(j) / v_i);
 			}

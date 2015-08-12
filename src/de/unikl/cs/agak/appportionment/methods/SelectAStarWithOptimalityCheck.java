@@ -39,28 +39,28 @@ public class SelectAStarWithOptimalityCheck extends LinearApportionmentMethod {
             seats[i] = new Double(Math.floor(deltaInv(votes[i] * astar))).intValue() + 1;
         }
 
-        // TODO resolve ties? May assign more than k seats now
+        // TODO resolve ties? May assign less than k seats now
 
         return new Apportionment(seats, astar);
     }
 
-    private double unitSize(double[] population, int k) {
-		final int n = population.length;
+    private double unitSize(double[] votes, int k) {
+		final int n = votes.length;
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;
-		for (double p : population) {
+		for (double p : votes) {
 			if (p > maxPop) maxPop = p;
 		}
 		double x_overbar = d(k - 1) / maxPop;
 //		System.out.println("x_overbar = " + x_overbar);
-		if (isOptimal(population, k, x_overbar)) return x_overbar;
+		if (isOptimal(votes, k, x_overbar)) return x_overbar;
 
 		Collection<Integer> I_x_overbar = new LinkedList<Integer>();
 		double Sigma_I_x_overbar = 0;
 		for (int i = 0; i < n; ++i) {
-			if (population[i] > d(0) / x_overbar) {
+			if (votes[i] > d(0) / x_overbar) {
 				I_x_overbar.add(i);
-				Sigma_I_x_overbar += population[i];
+				Sigma_I_x_overbar += votes[i];
 			}
 		}
 
@@ -81,7 +81,7 @@ public class SelectAStarWithOptimalityCheck extends LinearApportionmentMethod {
 		int k_hat = k;
 
 		for (int i : I_x_overbar) {
-			double v_i = population[i];
+			double v_i = votes[i];
 			// If sequence is not contributing, deltaInv might be invalid (< 0 etc),
 			// so explicitly handle that case:
 			if (d(0) / v_i > a_overbar) continue;

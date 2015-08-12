@@ -24,17 +24,17 @@ public class IterativeDMLS extends LinearApportionmentMethod {
     }
 
     @Override
-    public Apportionment apportion(final double[] population, int k) {
+    public Apportionment apportion(final double[] votes, int k) {
         // Initialize current values
-        final double[] values = new double[population.length];
+        final double[] values = new double[votes.length];
 
         // Seed list with initial values
-        for (int i = 0; i < population.length; i++) {
-            values[i] = d(0) / population[i];
+        for (int i = 0; i < votes.length; i++) {
+            values[i] = d(0) / votes[i];
         }
 
         // Subsequently assign seats
-        final int[] seats = new int[population.length];
+        final int[] seats = new int[votes.length];
         int imin = 0;
         while (k > 1) {
             // Find index with maximum value
@@ -44,7 +44,7 @@ public class IterativeDMLS extends LinearApportionmentMethod {
             }
 
             seats[imin]++;
-            values[imin] = d(seats[imin]) / population[imin];
+            values[imin] = d(seats[imin]) / votes[imin];
             k--;
         }
 

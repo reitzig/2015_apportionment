@@ -67,7 +67,7 @@ public class AStarChengEppstein extends LinearApportionmentMethod {
             seats[i] = new Double(Math.floor(deltaInv(votes[i] * astar))).intValue() + 1;
         }
 
-        // TODO resolve ties? May assign more than k seats now
+        // TODO resolve ties? May assign less than k seats now
 
         return new Apportionment(seats, astar);
     }

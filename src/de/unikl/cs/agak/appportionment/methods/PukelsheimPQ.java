@@ -28,6 +28,7 @@ import java.util.Comparator;
  *      Springer, 2014
  *
  * The implementation uses a priority queue for (asymptotically) efficient steps.
+ * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
 public class PukelsheimPQ extends LinearApportionmentMethod {
 
@@ -112,8 +113,15 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
       heap.add(e);
       sumSeats += step;
     }
+
+      // Compute astar; TODO can we do this smarter?
+      double astar = 0.0;
+      for ( int i=0; i<seats.length; i++ ) {
+          double cand = d(seats[i] - 1) / votes[i];
+          if ( cand > astar ) astar = cand;
+      }
     
-    return new Apportionment(seats,0.0); // TODO compute value
+    return new Apportionment(seats, astar); // TODO compute value
   }
   
   private static class Entry {

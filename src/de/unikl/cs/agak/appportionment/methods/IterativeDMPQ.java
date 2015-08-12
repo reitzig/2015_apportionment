@@ -27,9 +27,9 @@ public class IterativeDMPQ extends LinearApportionmentMethod {
     }
 
     @Override
-    public Apportionment apportion(final double[] population, int k) {
+    public Apportionment apportion(final double[] votes, int k) {
         // Initialize heap
-        final PriorityQueue<Entry> heap = new PriorityQueue<Entry>(population.length,
+        final PriorityQueue<Entry> heap = new PriorityQueue<Entry>(votes.length,
                 new Comparator<Entry>() {
                     @Override
                     public int compare(final Entry e1, final Entry e2) {
@@ -38,17 +38,17 @@ public class IterativeDMPQ extends LinearApportionmentMethod {
                 });
 
         // Seed heap with initial values
-        for (int i = 0; i < population.length; i++) {
-            heap.add(new Entry(i, d(0) / population[i]));
+        for (int i = 0; i < votes.length; i++) {
+            heap.add(new Entry(i, d(0) / votes[i]));
         }
 
         // Subsequently assign seats
-        final int[] seats = new int[population.length];
+        final int[] seats = new int[votes.length];
         while (k > 1) {
             final Entry e = heap.poll();
             final int i = e.index;
             seats[i]++;
-            e.value = d(seats[i]) / population[i];
+            e.value = d(seats[i]) / votes[i];
             heap.add(e);
             k--;
         }
