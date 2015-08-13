@@ -168,7 +168,7 @@ class Main {
 	private static void runAlgsOn(final ApportionmentInstance instance,
 		  final List<LinearApportionmentMethod> algs) throws Exception {
 		Map<LinearApportionmentMethod, Apportionment> apportionments =
-			  new HashMap<LinearApportionmentMethod, Apportionment>(8);
+                new HashMap<>(8);
 		for (final LinearApportionmentMethod alg : algs) {
 
 			try {

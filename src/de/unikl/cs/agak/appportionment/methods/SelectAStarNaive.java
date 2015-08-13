@@ -15,37 +15,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package de.unikl.cs.agak.appportionment.methods;
 
-import de.unikl.cs.agak.appportionment.Apportionment;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class SelectAStarNaive extends LinearApportionmentMethod {
+public class SelectAStarNaive extends SelectionBasedMethod {
 
 	public SelectAStarNaive(final double alpha, final double beta) {
 		super(alpha, beta);
 	}
 
+
     @Override
-    public Apportionment apportion(double[] votes, int k) {
-        // Compute $a^*$
-        final double astar = unitSize(votes, k);
-
-        // Derive seats
-        final int[] seats = new int[votes.length];
-        for (int i = 0; i < votes.length; i++) {
-            seats[i] = new Double(Math.floor(deltaInv(votes[i] * astar))).intValue() + 1;
-        }
-
-        // TODO resolve ties? May assign less than k seats now
-
-        return new Apportionment(seats, astar);
-    }
-
-    private double unitSize(double[] votes, int k) {
+    double unitSize(final double[] votes, int k) {
 		final int n = votes.length;
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;
@@ -55,14 +39,14 @@ public class SelectAStarNaive extends LinearApportionmentMethod {
 		double x_overbar = d(k) / maxPop; // clearly suboptimal and feasible
 //		System.out.println("x_overbar = " + x_overbar);
 
-		Collection<Integer> I_x_overbar = new LinkedList<Integer>();
+		Collection<Integer> I_x_overbar = new LinkedList<>();
 		for (int i = 0; i < n; ++i) {
 			if (votes[i] > d(0) / x_overbar) {
 				I_x_overbar.add(i);
 			}
 		}
 
-		List<Double> A = new ArrayList<Double>();
+		List<Double> A = new ArrayList<>();
 
 		for (int i : I_x_overbar) {
 			double v_i = votes[i];

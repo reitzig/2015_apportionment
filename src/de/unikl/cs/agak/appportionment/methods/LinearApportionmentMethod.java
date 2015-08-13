@@ -19,6 +19,8 @@ import de.unikl.cs.agak.appportionment.Apportionment;
 
 import java.util.*;
 
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
+
 public abstract class LinearApportionmentMethod {
     final double alpha;
     final double beta;
@@ -50,7 +52,4 @@ public abstract class LinearApportionmentMethod {
     public String toString() {
         return this.getClass().getSimpleName() + "(" + "alpha=" + alpha + ", beta=" + beta + ')';
     }
-
-
-
 }

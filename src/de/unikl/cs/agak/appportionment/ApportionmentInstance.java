@@ -31,7 +31,11 @@ public class ApportionmentInstance {
 
     @Override
     public String toString() {
-        return "Instance(n=" + votes.length + ", votes=" + Arrays.toString(votes) + ", k=" + k + ')';
+        return "Instance(" + System.getProperty("line.separator") +
+                "\tn=" + votes.length + ","  + System.getProperty("line.separator") +
+                "\tvotes=" + Arrays.toString(votes) + "," + System.getProperty("line.separator") +
+                "\tk=" + k + System.getProperty("line.separator") +
+                ")";
     }
 }
 

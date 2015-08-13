@@ -15,36 +15,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package de.unikl.cs.agak.appportionment.methods;
 
-import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.util.RankSelection;
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class SelectAStarWithOptimalityCheck extends LinearApportionmentMethod {
+public class SelectAStarWithOptimalityCheck extends SelectionBasedMethod {
 
 	public SelectAStarWithOptimalityCheck(final double alpha, final double beta) {
 		super(alpha, beta);
 	}
 
     @Override
-    public Apportionment apportion(double[] votes, int k) {
-        // Compute $a^*$
-        final double astar = unitSize(votes, k);
-
-        // Derive seats
-        final int[] seats = new int[votes.length];
-        for (int i = 0; i < votes.length; i++) {
-            seats[i] = new Double(Math.floor(deltaInv(votes[i] * astar))).intValue() + 1;
-        }
-
-        // TODO resolve ties? May assign less than k seats now
-
-        return new Apportionment(seats, astar);
-    }
-
-    private double unitSize(double[] votes, int k) {
+    double unitSize(final double[] votes, int k) {
 		final int n = votes.length;
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;
@@ -55,7 +39,7 @@ public class SelectAStarWithOptimalityCheck extends LinearApportionmentMethod {
 //		System.out.println("x_overbar = " + x_overbar);
 		if (isOptimal(votes, k, x_overbar)) return x_overbar;
 
-		Collection<Integer> I_x_overbar = new LinkedList<Integer>();
+		Collection<Integer> I_x_overbar = new LinkedList<>();
 		double Sigma_I_x_overbar = 0;
 		for (int i = 0; i < n; ++i) {
 			if (votes[i] > d(0) / x_overbar) {

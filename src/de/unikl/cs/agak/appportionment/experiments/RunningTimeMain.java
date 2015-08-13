@@ -42,7 +42,7 @@ public class RunningTimeMain {
     static String SEP = "\t";
 
     /**
-     * Writes a line of strings separated by <code>SEP</code> to the given stream, and flushes it.
+     * Writes a line of strings separated by {@link #SEP} to the given stream, and flushes it.
      * @param target Stream to write to.
      * @param line   List of values to write
      * @throws IOException
@@ -79,7 +79,7 @@ public class RunningTimeMain {
         final String[] algosArray = args[0].split("\\s*,\\s*");
         if (args.length >= 2) {
             final String[] nsArray = args[1].split("\\s*,\\s*");
-            ns = new ArrayList<Integer>(nsArray.length);
+            ns = new ArrayList<>(nsArray.length);
             for (final String n : nsArray) {
                 ns.add(Integer.parseInt(n));
             }
@@ -111,7 +111,7 @@ public class RunningTimeMain {
             beta = Double.parseDouble(args[8]);
         }
 
-        final List<String> algoNames = new LinkedList<String>();
+        final List<String> algoNames = new LinkedList<>();
         if ("all".equalsIgnoreCase(algosArray[0])) {
             algoNames.addAll(algorithms.keySet());
         } else {
@@ -191,8 +191,8 @@ public class RunningTimeMain {
                         sizeTotalRunMillis += perRunMillis;
 
                         // do something so the calls to apportion are not optimized away
-                        for (int s : app.seats) {
-                            s -= app.seats[0];
+                        for (int i = 0; i < app.seats.length; i++) {
+                            app.seats[i] -= 1;
                         }
 
                         writeSeparatedLine(out, algoName, String.valueOf(n), String.valueOf(input.k), String.valueOf(inputNr),
@@ -281,8 +281,8 @@ public class RunningTimeMain {
     }
 
     public static Map<String, Class<? extends LinearApportionmentMethod>> algorithms =
-            new LinkedHashMap<String, Class<? extends LinearApportionmentMethod>>();
-    public static Map<String, String> abbreviations = new HashMap<String, String>();
+            new LinkedHashMap<>();
+    public static Map<String, String> abbreviations = new HashMap<>();
 
     static {
         algorithms.put("SelectAstarNaive", SelectAStarNaive.class);

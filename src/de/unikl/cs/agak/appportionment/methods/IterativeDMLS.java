@@ -35,7 +35,7 @@ public class IterativeDMLS extends LinearApportionmentMethod {
 
         // Subsequently assign seats
         final int[] seats = new int[votes.length];
-        int imin = 0;
+        int imin;
         while (k > 1) {
             // Find index with maximum value
             imin = 0;
@@ -57,6 +57,9 @@ public class IterativeDMLS extends LinearApportionmentMethod {
         final double astar = values[imin];
         seats[imin]++;
 
-        return new Apportionment(seats, astar);
+        int[] tiedSeats = new int[votes.length];
+        // TODO find tied seats!
+
+        return new Apportionment(k, seats, tiedSeats, astar);
     }
 }

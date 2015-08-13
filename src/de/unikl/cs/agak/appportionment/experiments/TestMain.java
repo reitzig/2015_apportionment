@@ -1,15 +1,31 @@
+/*
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package de.unikl.cs.agak.appportionment.experiments;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.methods.*;
-import de.unikl.cs.agak.appportionment.util.FuzzyNumerics;
+
+import static de.unikl.cs.agak.appportionment.util.AssortedUtils.isBinary;
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
+import static edu.princeton.cs.introcs.StdStats.sum;
+
 import de.unikl.cs.agak.appportionment.util.SedgewickRandom;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
@@ -34,66 +50,132 @@ public class TestMain {
     );
 
     public static void main(final String[] args) throws Exception {
-        // Create instances
-        final long seed = System.currentTimeMillis();
+        // Initialize random source
+        final long seed = args.length > 0 ? Long.parseLong(args[0]) : System.currentTimeMillis();
         System.out.println("Seed: " + seed);
         final SedgewickRandom r = new SedgewickRandom(seed);
+
+        // Create instances
         final ApportionmentInstanceFactory.KFactory kFactory = new ApportionmentInstanceFactory.KFactory(FACT_K);
-        final List<ApportionmentInstanceWithMethod> tests = new LinkedList<ApportionmentInstanceWithMethod>();
+        final List<ApportionmentInstanceWithMethod> tests = new LinkedList<>();
         for ( int i=0; i<REPS; i++ ) {
             final ApportionmentInstance inst = ApportionmentInstanceFactory.uniformRandomInstance(r, r.uniform(MIN_N, MAX_N), kFactory);
             final double alpha = r.uniform(MIN_ALPHA, MAX_ALPHA);
             tests.add(new ApportionmentInstanceWithMethod(inst.votes, inst.k, alpha, r.uniform(0.0, alpha)));
         }
 
+        // Test all combinations of algorithm and instance
         for ( Class<? extends LinearApportionmentMethod> alg : algs ) {
             System.out.println();
             boolean correct = true;
-            final ArrayList<String> errors = new ArrayList<String>(4);
+            final ArrayList<String> errors = new ArrayList<>(4);
             for ( ApportionmentInstanceWithMethod inst : tests ) {
                 // Instantiate implementation and run on instance
                 LinearApportionmentMethod algInst = alg.getConstructor(double.class, double.class).newInstance(inst.alpha, inst.beta);
                 Apportionment result = algInst.apportion(inst.votes, inst.k);
 
                 // Tests against dumb mistakes
-                if ( result.seats.length != inst.votes.length ) {
-                    errors.add("wrong number of parties served (" + result.seats.length + ")");
+                if ( result.seats.length != inst.votes.length || result.tiedSeats.length != inst.votes.length ) {
+                    errors.add("wrong number of parties served (" + result.seats.length + ";" + result.tiedSeats.length +")");
                     correct = false;
                 }
 
-                int sumSeats = 0;
-                for ( int s : result.seats ) { sumSeats += s; }
-                if ( sumSeats != inst.k ) {
-                    errors.add("wrong number of seats assigned (" + sumSeats + ")");
+                int sumSeats = sum(result.seats);
+                if ( sumSeats > inst.k ) {
+                    errors.add("too many seats assigned (" + sumSeats + ")");
                     correct = false;
                 }
 
-                // Verify apportionment according to the min-max-inequality (Pukelsheim Theorem 4.5)
-                double min = Double.MAX_VALUE;
-                double max = Double.MIN_VALUE;
-                for ( int i=0; i<inst.votes.length; i++ ) {
-                    double quotient = inst.votes[i] / algInst.d(result.seats[i]);
-                    if ( quotient > max ) max = quotient;
-                    quotient = inst.votes[i] / algInst.d(result.seats[i]-1);
-                    if ( quotient < min ) min = quotient;
-                }
-                if ( max > min ) {
-                    errors.add("seat assignment wrong");
+                int sumTiedSeats = sum(result.tiedSeats);
+                if ( !isBinary(result.tiedSeats) ) {
+                    errors.add("bad number of tied seats");
                     correct = false;
                 }
-                if ( 1/result.astar > min || 1/result.astar < max ) {
-                    errors.add("astar wrong");
+                if ( sumSeats + sumTiedSeats < inst.k ) {
+                    errors.add("not enough seats assigned (" + sumSeats + " + [" + sumTiedSeats + "])");
                     correct = false;
                 }
 
-                if ( !correct ) {
-                    printError(errors, alg, inst, result);
+                // Verify that all tied seats have value astar, and the others a smaller
+                int lastAstar = -1;
+                double lastAstarVal = -1.0;
+                for (int i = 0; i < result.tiedSeats.length; i++) {
+                    if ( result.tiedSeats[i] == 0 ) {
+                        // Party is not tied, so either there are no ties
+                        // or this party should not gotten its last seat with
+                        // value astar!
+                        final double lastVal = algInst.d(result.seats[i] - 1) / inst.votes[i];
+
+                        if ( !fuzzyLess(lastVal, result.astar) ) {
+                            if (lastAstar == -1) {
+                                // This is the first violation; it's only an error if there are two!
+                                lastAstar = i;
+                                lastAstarVal = lastVal;
+                            } else {
+                                if (lastAstar != -2) {
+                                    // Print first violation
+                                    errors.add("tied seats are wrong (" + lastAstar + "; " + lastAstarVal + ")");
+                                    lastAstar = -2;
+                                }
+                                errors.add("tied seats are wrong (" + i + "; " + lastVal + ")");
+                                correct = false;
+                            }
+                        }
+                    }
+                    if ( result.tiedSeats[i] == 1 ) {
+                        // Party is tied for its last seat, so its next value should be astar!
+                        final double nextVal = algInst.d(result.seats[i]) / inst.votes[i];
+
+                        if ( !closeToEqual(nextVal, result.astar) ) {
+                            errors.add("tied seats are wrong (" + i + "; " + nextVal + ")");
+                            correct = false;
+                        }
+                    }
+                }
+
+                // Verify all implied seat assignments according to the min-max-inequality (Pukelsheim Theorem 4.5)
+                if ( correct ) {
+                    // Test each assignment
+                    for ( int[] asgnm : result.assignments() ) {
+                        if ( asgnm.length != result.seats.length ) {
+                            errors.add("derived assignment has wrong size (" +
+                                    asgnm.length + "; " + Arrays.toString(asgnm) + ")");
+                        }
+                        if (sum(asgnm) != inst.k) {
+                            errors.add("derived assignment has wrong seat number (" +
+                                    sum(asgnm) + "; " + Arrays.toString(asgnm) + ")");
+                            correct = false;
+                        }
+
+                        double min = Double.MAX_VALUE;
+                        double max = Double.MIN_VALUE;
+                        for (int i = 0; i < inst.votes.length; i++) {
+                            double quotient = inst.votes[i] / algInst.d(result.seats[i]);
+                            if (quotient > max) max = quotient;
+                            quotient = inst.votes[i] / algInst.d(result.seats[i] - 1);
+                            if (quotient < min) min = quotient;
+                        }
+                        if (max > min) {
+                            errors.add("seat assignment wrong (" + max + " > " + min + ")" + " for " + System.getProperty("line.separator") +
+                                    "\t" + Arrays.toString(asgnm));
+                            correct = false;
+                        }
+                        if (fuzzyGreater(1 / result.astar, min) || fuzzyLess(1 / result.astar, max)) {
+                            errors.add("astar not between " + 1 / min + " and " + 1 / max + " for " + System.getProperty("line.separator") +
+                                    "\t" + Arrays.toString(asgnm));
+                            correct = false;
+                        }
+                    }
+                }
+
+                if (!correct) {
+                    printError(errors, alg.getSimpleName(), inst, result);
                     break;
                 }
             }
 
             if ( correct ) {
-                System.out.println(alg.getSimpleName() + " correct.");
+                System.out.println(alg.getSimpleName() + "is correct. Hopefully.");
             }
         }
     }

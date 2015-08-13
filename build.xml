@@ -9,7 +9,7 @@
 
   <target name="compile">
     <mkdir dir="${build}"/>
-    <javac srcdir="${src}" destdir="${build}" compiler="javac1.7">
+    <javac srcdir="${src}" destdir="${build}" compiler="javac1.7" debug="true">
       <classpath>
         <fileset dir="${lib}">
           <include name="**/*.jar" />
@@ -26,7 +26,15 @@
   </target>
 
   <target name="test" depends="compile">
-    <java classname="de.unikl.cs.agak.appportionment.experiments.TestMain" dir="${build}" fork="true" output="developer_test_report"/>
+    <java classname="de.unikl.cs.agak.appportionment.experiments.TestMain"
+          dir="${build}"
+          fork="true"
+          output="developer_test_report">
+      <assertions>
+        <enable/>
+      </assertions>
+      <arg value="1439483575596"/>
+    </java>
   </target>
 
   <target name="run" depends="compile">
