@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.unikl.cs.agak.appportionment.methods;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
+import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.EPSILON;
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.closeToEqual;
@@ -29,22 +30,24 @@ abstract public class SelectionBasedMethod extends LinearApportionmentMethod {
     }
 
     @Override
-    final public Apportionment apportion(final double[] votes, int k) {
+    final public Apportionment apportion(final ApportionmentInstance instance) {
+        final int n = instance.votes.length;
+
         // Compute $a^*$
-        final double astar = unitSize(votes, k);
+        final double astar = unitSize(instance);
 
         // Derive seats
-        final int[] seats = new int[votes.length];
-        for (int i = 0; i < votes.length; i++) {
-            seats[i] = (int)Math.floor(deltaInv(votes[i] * astar) + EPSILON) + 1;
+        final int[] seats = new int[n];
+        for (int i = 0; i < n; i++) {
+            seats[i] = (int) Math.floor(deltaInv(instance.votes[i] * astar) + EPSILON) + 1;
             // TODO use fuzzy floor when it can deal with negative parameters? Or just add 1 before rounding?
         }
 
         // Now we have *all* seats with value astar, which may be too many.
         // Identify ties for the last few seats!
-        final int[] tiedSeats = new int[votes.length];
-        for (int i = 0; i < votes.length; i++) {
-            if ( closeToEqual(d(seats[i] - 1) / votes[i], astar) ) {
+        final int[] tiedSeats = new int[n];
+        for (int i = 0; i < n; i++) {
+            if (closeToEqual(d(seats[i] - 1) / instance.votes[i], astar)) {
                 tiedSeats[i] = 1;
                 seats[i] -= 1;
             }
@@ -52,8 +55,12 @@ abstract public class SelectionBasedMethod extends LinearApportionmentMethod {
                     That's not wrong, but do we want that? */
         }
 
-        return new Apportionment(k, seats, tiedSeats, astar);
+        return new Apportionment(instance.k, seats, tiedSeats, astar);
     }
 
-    abstract double unitSize(double[] votes, int k);
+    /**
+     * @param instance An instance of the apportionment problem.
+     * @return The (reciprocal of the) proportionality constant (a*).
+     */
+    abstract double unitSize(ApportionmentInstance instance);
 }

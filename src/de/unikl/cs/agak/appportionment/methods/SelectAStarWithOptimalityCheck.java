@@ -15,11 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package de.unikl.cs.agak.appportionment.methods;
 
+import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.util.RankSelection;
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
 
 import java.util.Collection;
 import java.util.LinkedList;
+
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
 
 public class SelectAStarWithOptimalityCheck extends SelectionBasedMethod {
 
@@ -28,29 +30,30 @@ public class SelectAStarWithOptimalityCheck extends SelectionBasedMethod {
 	}
 
     @Override
-    double unitSize(final double[] votes, int k) {
-		final int n = votes.length;
+    double unitSize(final ApportionmentInstance instance) {
+        final int n = instance.votes.length;
+
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;
-		for (double p : votes) {
-			if (p > maxPop) maxPop = p;
+        for (double p : instance.votes) {
+            if (p > maxPop) maxPop = p;
 		}
-		double x_overbar = d(k - 1) / maxPop;
+        double x_overbar = d(instance.k - 1) / maxPop;
 //		System.out.println("x_overbar = " + x_overbar);
-		if (isOptimal(votes, k, x_overbar)) return x_overbar;
+        if (isOptimal(instance.votes, instance.k, x_overbar)) return x_overbar;
 
 		Collection<Integer> I_x_overbar = new LinkedList<>();
 		double Sigma_I_x_overbar = 0;
 		for (int i = 0; i < n; ++i) {
-			if (votes[i] > d(0) / x_overbar) {
-				I_x_overbar.add(i);
-				Sigma_I_x_overbar += votes[i];
-			}
+            if (instance.votes[i] > d(0) / x_overbar) {
+                I_x_overbar.add(i);
+                Sigma_I_x_overbar += instance.votes[i];
+            }
 		}
 
 		final double a_overbar =
-			  (alpha * k + beta * I_x_overbar.size()) / Sigma_I_x_overbar;
-		final double a_underbar = Math.max(0,
+                (alpha * instance.k + beta * I_x_overbar.size()) / Sigma_I_x_overbar;
+        final double a_underbar = Math.max(0,
 			  a_overbar - ((alpha + beta) * I_x_overbar.size()) / Sigma_I_x_overbar);
 //		System.out.println("a_underbar = " + a_underbar);
 //		System.out.println("a_overbar = " + a_overbar);
@@ -62,11 +65,11 @@ public class SelectAStarWithOptimalityCheck extends SelectionBasedMethod {
 		final double[] A_hat = new double[A_hat_bound];
 
 		int A_hat_size = 0;
-		int k_hat = k;
+        int k_hat = instance.k;
 
 		for (int i : I_x_overbar) {
-			double v_i = votes[i];
-			// If sequence is not contributing, deltaInv might be invalid (< 0 etc),
+            double v_i = instance.votes[i];
+            // If sequence is not contributing, deltaInv might be invalid (< 0 etc),
 			// so explicitly handle that case:
 			if (d(0) / v_i > a_overbar) continue;
 

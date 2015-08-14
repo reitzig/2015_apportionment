@@ -16,9 +16,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.unikl.cs.agak.appportionment.methods;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
+import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
-import java.util.PriorityQueue;
 import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class IterativeDMPQ extends LinearApportionmentMethod {
 
@@ -27,9 +28,11 @@ public class IterativeDMPQ extends LinearApportionmentMethod {
     }
 
     @Override
-    public Apportionment apportion(final double[] votes, int k) {
+    public Apportionment apportion(final ApportionmentInstance instance) {
+        final int n = instance.votes.length;
+
         // Initialize heap
-        final PriorityQueue<Entry> heap = new PriorityQueue<>(votes.length,
+        final PriorityQueue<Entry> heap = new PriorityQueue<>(n,
                 new Comparator<Entry>() {
                     @Override
                     public int compare(final Entry e1, final Entry e2) {
@@ -38,17 +41,18 @@ public class IterativeDMPQ extends LinearApportionmentMethod {
                 });
 
         // Seed heap with initial values
-        for (int i = 0; i < votes.length; i++) {
-            heap.add(new Entry(i, d(0) / votes[i]));
+        for (int i = 0; i < n; i++) {
+            heap.add(new Entry(i, d(0) / instance.votes[i]));
         }
 
         // Subsequently assign seats
-        final int[] seats = new int[votes.length];
+        final int[] seats = new int[n];
+        int k = instance.k;
         while (k > 1) {
             final Entry e = heap.poll();
             final int i = e.index;
             seats[i]++;
-            e.value = d(seats[i]) / votes[i];
+            e.value = d(seats[i]) / instance.votes[i];
             heap.add(e);
             k--;
         }
@@ -57,11 +61,11 @@ public class IterativeDMPQ extends LinearApportionmentMethod {
         final Entry e = heap.poll();
         seats[e.index]++;
 
-        int[] tiedSeats = new int[votes.length];
+        int[] tiedSeats = new int[n];
         // TODO find tied seats!
 
         // Next element determines the last seat
-        return new Apportionment(k, seats, tiedSeats, e.value);
+        return new Apportionment(instance.k, seats, tiedSeats, e.value);
     }
 
     private static class Entry {

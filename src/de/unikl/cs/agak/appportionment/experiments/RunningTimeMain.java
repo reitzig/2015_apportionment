@@ -25,14 +25,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Sebastian Wild (s_wild@cs.uni-kl.de)
@@ -182,7 +175,7 @@ public class RunningTimeMain {
 
                         final long startTime = System.nanoTime();
                         for (int r = 0; r < repetitions; ++r) {
-                            app = alg.apportion(input.votes, input.k);
+                            app = alg.apportion(input);
                         }
                         final long endTime = System.nanoTime();
                         final long nanos = endTime - startTime;
@@ -273,7 +266,7 @@ public class RunningTimeMain {
             final ApportionmentInstance instance =
                     ApportionmentInstanceFactory.uniformRandomInstance(30, new ApportionmentInstanceFactory.KFactory(5));
             for (final String algoName : algoNames) {
-                algoInstance(algoName, alpha, beta).apportion(instance.votes, 33);
+                algoInstance(algoName, alpha, beta).apportion(instance);
             }
         }
 

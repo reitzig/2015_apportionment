@@ -18,14 +18,16 @@ package de.unikl.cs.agak.appportionment.experiments;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.methods.*;
+import de.unikl.cs.agak.appportionment.util.SedgewickRandom;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import static de.unikl.cs.agak.appportionment.util.AssortedUtils.isBinary;
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
 import static edu.princeton.cs.introcs.StdStats.sum;
-
-import de.unikl.cs.agak.appportionment.util.SedgewickRandom;
-
-import java.util.*;
 
 /**
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
@@ -72,7 +74,7 @@ public class TestMain {
             for ( ApportionmentInstanceWithMethod inst : tests ) {
                 // Instantiate implementation and run on instance
                 LinearApportionmentMethod algInst = alg.getConstructor(double.class, double.class).newInstance(inst.alpha, inst.beta);
-                Apportionment result = algInst.apportion(inst.votes, inst.k);
+                Apportionment result = algInst.apportion(inst);
 
                 // Tests against dumb mistakes
                 if ( result.seats.length != inst.votes.length || result.tiedSeats.length != inst.votes.length ) {

@@ -15,11 +15,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package de.unikl.cs.agak.appportionment.methods;
 
+import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.util.RankSelection;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
 
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.closeToEqual;
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyFloor;
 
 /**
  * Implements the algorithm presented in
@@ -38,23 +41,23 @@ public class AStarChengEppstein extends SelectionBasedMethod {
     }
 
     @Override
-    double unitSize(final double[] votes, int k) {
+    double unitSize(final ApportionmentInstance instance) {
         // Initialize sequences
         // TODO move to 𝒜, ξ? Seems to skrew with most IDEs, though.
         Collection<Sequence> A = new LinkedList<>();
-        for (double v_i : votes) {
+        for (double v_i : instance.votes) {
             A.add(new Sequence(v_i));
         }
 
-        Collection<Sequence> C = findContributingSequences(A, k);
-        double coarse = sInv(C, k);
+        Collection<Sequence> C = findContributingSequences(A, instance.k);
+        double coarse = sInv(C, instance.k);
 
-        if (r(coarse, A) >= k) {
-            coarse = lowerRankCoarseSolution(A, k, coarse);
+        if (r(coarse, A) >= instance.k) {
+            coarse = lowerRankCoarseSolution(A, instance.k, coarse);
         }
-        assert r(coarse, A) < k;
+        assert r(coarse, A) < instance.k;
 
-        return coarseToExact(A, k, coarse);
+        return coarseToExact(A, instance.k, coarse);
     }
 
     private Collection<Sequence> findContributingSequences(Collection<Sequence> A, int k) {

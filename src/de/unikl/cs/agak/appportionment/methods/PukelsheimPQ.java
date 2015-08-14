@@ -16,9 +16,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.unikl.cs.agak.appportionment.methods;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
+import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
-import java.util.PriorityQueue;
 import java.util.Comparator;
+import java.util.PriorityQueue;
 
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.EPSILON;
 import static edu.princeton.cs.introcs.StdStats.sum;
@@ -42,13 +43,15 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
 
 
     @Override
-    public Apportionment apportion(final double[] votes, int k) {
+    public Apportionment apportion(final ApportionmentInstance instance) {
+        final int n = instance.votes.length;
+
         // Compute initial assignment using guess sum(population)/k
-        final int[] seats = new int[votes.length];
-        final int[] tiedSeats = new int[votes.length];
+        final int[] seats = new int[n];
+        final int[] tiedSeats = new int[n];
         final double astar;
 
-        double sumPop = sum(votes);
+        double sumPop = sum(instance.votes);
 
         final double D;
         if (beta <= alpha) {
@@ -60,14 +63,14 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
            * which normalizes to
            *    s(n) = n - 1 + beta/alpha.
            */
-            D = (k + votes.length * (beta / alpha - 0.5)) / (sumPop);
+            D = (instance.k + n * (beta / alpha - 0.5)) / (sumPop);
         } else {
             // Fallback to the universal estimator
-            D = k / sumPop;
+            D = instance.k / sumPop;
         }
 
-        for (int i = 0; i < votes.length; i++) {
-            seats[i] = (int) Math.floor(deltaInv(votes[i] * D) + EPSILON) + 1;
+        for (int i = 0; i < n; i++) {
+            seats[i] = (int) Math.floor(deltaInv(instance.votes[i] * D) + EPSILON) + 1;
             // TODO correct? use fuzzy floor when it can deal with negative parameters?
         }
 
@@ -76,11 +79,11 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
         final int order;
         final int offset;
         final int step;
-        if (sumSeats == k) {
+        if (sumSeats == instance.k) {
             // seats and tiedSeats are already correct
             astar = D;
         } else {
-            if (sumSeats < k) {
+            if (sumSeats < instance.k) {
                 // Setup: max-heap, offset for next d_i, add seats
                 order = 1;
                 offset = 0;
@@ -94,7 +97,7 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
 
 
             // Initialize heap
-            final PriorityQueue<Entry> heap = new PriorityQueue<>(votes.length,
+            final PriorityQueue<Entry> heap = new PriorityQueue<>(n,
                     new Comparator<Entry>() {
                         @Override
                         public int compare(final Entry e1, final Entry e2) {
@@ -103,16 +106,16 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
                     });
 
             // Seed heap with initial values
-            for (int i = 0; i < votes.length; i++) {
-                heap.add(new Entry(i, d(seats[i] + offset) / votes[i]));
+            for (int i = 0; i < n; i++) {
+                heap.add(new Entry(i, d(seats[i] + offset) / instance.votes[i]));
             }
 
             // Subsequently adapt seats
-            while (sumSeats != k) {
+            while (sumSeats != instance.k) {
                 final Entry e = heap.poll();
                 final int i = e.index;
                 seats[i] += step;
-                e.value = d(seats[i] + offset) / votes[i];
+                e.value = d(seats[i] + offset) / instance.votes[i];
                 heap.add(e);
                 sumSeats += step;
             }
@@ -120,7 +123,7 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
             // Compute astar; TODO can we do this smarter?
             double astarT = 0.0;
             for (int i = 0; i < seats.length; i++) {
-                double cand = d(seats[i] - 1) / votes[i];
+                double cand = d(seats[i] - 1) / instance.votes[i];
                 if (cand > astarT) astarT = cand;
             }
             astar = astarT;
@@ -129,7 +132,7 @@ public class PukelsheimPQ extends LinearApportionmentMethod {
         }
 
 
-        return new Apportionment(k, seats, tiedSeats, astar);
+        return new Apportionment(instance.k, seats, tiedSeats, astar);
     }
 
     private static class Entry {

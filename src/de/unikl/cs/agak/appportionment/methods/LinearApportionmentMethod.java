@@ -16,10 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.unikl.cs.agak.appportionment.methods;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
-
-import java.util.*;
-
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
+import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
 public abstract class LinearApportionmentMethod {
     final double alpha;
@@ -45,8 +42,10 @@ public abstract class LinearApportionmentMethod {
 
     /**
      * Finds an apportionment for the given parameters.
+     * @param instance An instance of the apportionment problem, consisting of
+     *                 votes and house size.
      */
-    public abstract Apportionment apportion(final double[] votes, final int k);
+    public abstract Apportionment apportion(ApportionmentInstance instance);
 
     @Override
     public String toString() {

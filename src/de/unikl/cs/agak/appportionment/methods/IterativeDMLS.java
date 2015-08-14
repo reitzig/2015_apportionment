@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.unikl.cs.agak.appportionment.methods;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
+import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
 public class IterativeDMLS extends LinearApportionmentMethod {
 
@@ -24,42 +25,45 @@ public class IterativeDMLS extends LinearApportionmentMethod {
     }
 
     @Override
-    public Apportionment apportion(final double[] votes, int k) {
+    public Apportionment apportion(final ApportionmentInstance instance) {
+        final int n = instance.votes.length;
+
         // Initialize current values
-        final double[] values = new double[votes.length];
+        final double[] values = new double[n];
 
         // Seed list with initial values
-        for (int i = 0; i < votes.length; i++) {
-            values[i] = d(0) / votes[i];
+        for (int i = 0; i < n; i++) {
+            values[i] = d(0) / instance.votes[i];
         }
 
         // Subsequently assign seats
-        final int[] seats = new int[votes.length];
+        final int[] seats = new int[n];
         int imin;
+        int k = instance.k;
         while (k > 1) {
             // Find index with maximum value
             imin = 0;
-            for (int i = 1; i < values.length; i++) {
+            for (int i = 1; i < n; i++) {
                 if (values[i] < values[imin]) imin = i;
             }
 
             seats[imin]++;
-            values[imin] = d(seats[imin]) / votes[imin];
+            values[imin] = d(seats[imin]) / instance.votes[imin];
             k--;
         }
 
         // Find maximum for last seat
         imin = 0;
-        for (int i = 1; i < values.length; i++) {
+        for (int i = 1; i < n; i++) {
             if (values[i] < values[imin]) imin = i;
         }
 
         final double astar = values[imin];
         seats[imin]++;
 
-        int[] tiedSeats = new int[votes.length];
+        int[] tiedSeats = new int[n];
         // TODO find tied seats!
 
-        return new Apportionment(k, seats, tiedSeats, astar);
+        return new Apportionment(instance.k, seats, tiedSeats, astar);
     }
 }

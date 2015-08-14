@@ -95,14 +95,14 @@ class Main {
 		for (int i = 0; i < 12000; ++i) {
 			final ApportionmentInstance
 				  instance = ApportionmentInstanceFactory.uniformRandomInstance(30, new ApportionmentInstanceFactory.KFactory(5,10));
-			new SelectAStarNaive(2, 1).apportion(instance.votes, 33);
-			new SelectAStarWithOptimalityCheck(2, 1).apportion(instance.votes, 33);
-			new SelectAStar(2, 1).apportion(instance.votes, 33);
-			new AStarChengEppstein(2, 1).apportion(instance.votes, 33);
-			new IterativeDMPQ(2, 1).apportion(instance.votes, 33);
-			new IterativeDMLS(2, 1).apportion(instance.votes, 33);
-			new PukelsheimPQ(2, 1).apportion(instance.votes, 33);
-		}
+            new SelectAStarNaive(2, 1).apportion(instance);
+            new SelectAStarWithOptimalityCheck(2, 1).apportion(instance);
+            new SelectAStar(2, 1).apportion(instance);
+            new AStarChengEppstein(2, 1).apportion(instance);
+            new IterativeDMPQ(2, 1).apportion(instance);
+            new IterativeDMLS(2, 1).apportion(instance);
+            new PukelsheimPQ(2, 1).apportion(instance);
+        }
 
 		System.out.println("Warmup finished");
 	}
@@ -173,8 +173,8 @@ class Main {
 
 			try {
 				final Stopwatch stopwatch = new Stopwatch();
-				final Apportionment app = alg.apportion(instance.votes, instance.k);
-				System.out.println(alg + " took " + stopwatch.elapsedTime() + "s.");
+                final Apportionment app = alg.apportion(instance);
+                System.out.println(alg + " took " + stopwatch.elapsedTime() + "s.");
 
 				apportionments.put(alg, app);
 			} catch (Exception e) {
@@ -202,25 +202,25 @@ class Main {
 
 		for (int k = 1; k < 50; ++k) {
 
-			double[] example = {20.0, 30.0, 150.0, 17.0, 3.0};
-//		example = new double[]{30.0, 150.0};
-//		int k = 6;
+            ApportionmentInstance example = new ApportionmentInstance(
+                    new double[]{20.0, 30.0, 150.0, 17.0, 3.0}, k);
+
 			System.out.println("\n\nk = " + k);
 
 			LinearApportionmentMethod ce = new AStarChengEppstein(alpha, beta);
 			LinearApportionmentMethod sel = new SelectAStarWithOptimalityCheck(alpha, beta);
 			LinearApportionmentMethod pri = new SelectAStarNaive(alpha, beta);
 			LinearApportionmentMethod puk = new PukelsheimPQ(alpha, beta);
-			System.out.println("\tExample: " + sel.apportion(example, k) + "");
-			System.out.println("\tExample: " + pri.apportion(example, k) + "");
-			System.out.println("\tExample 1/unit: " + 1 / sel.apportion(example, k).astar + "");
-			System.out.println("\tExample: " + ce.apportion(example, k) + "");
-			System.out.println(
+            System.out.println("\tExample: " + sel.apportion(example) + "");
+            System.out.println("\tExample: " + pri.apportion(example) + "");
+            System.out.println("\tExample 1/unit: " + 1 / sel.apportion(example).astar + "");
+            System.out.println("\tExample: " + ce.apportion(example) + "");
+            System.out.println(
 				  "sel.unitSize(example,k) == ce.unitSize(example,k) = " + (sel.apportion(
-                          example, k) == ce.apportion(example, k)));
-			allEqual &= pri.apportion(example, k) == ce.apportion(example, k);
-			allEqual &= pri.apportion(example, k) == sel.apportion(example, k);
-		}
+                          example) == ce.apportion(example)));
+            allEqual &= pri.apportion(example) == ce.apportion(example);
+            allEqual &= pri.apportion(example) == sel.apportion(example);
+        }
 		System.out.println("allEqual = " + allEqual);
 	}
 
