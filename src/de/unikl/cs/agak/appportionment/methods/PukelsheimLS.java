@@ -18,9 +18,6 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
-import java.util.Comparator;
-import java.util.PriorityQueue;
-
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.EPSILON;
 import static edu.princeton.cs.introcs.StdStats.sum;
 
@@ -31,16 +28,15 @@ import static edu.princeton.cs.introcs.StdStats.sum;
  * Proportional Representation
  * Springer, 2014
  * <p/>
- * The implementation uses a priority queue for (asymptotically) efficient steps.
+ * The implementation uses a linear scan in each step steps.
  *
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-public class PukelsheimPQ extends IterativeMethod {
+public class PukelsheimLS extends IterativeMethod {
 
-    public PukelsheimPQ(final double alpha, final double beta) {
+    public PukelsheimLS(final double alpha, final double beta) {
         super(alpha, beta);
     }
-
 
     @Override
     public Apportionment apportion(final ApportionmentInstance instance) {
@@ -78,7 +74,7 @@ public class PukelsheimPQ extends IterativeMethod {
         final int offset;
         final int step;
         if (sumSeats == instance.k) {
-            // no ties since we assign *all* seats with value a*
+            // seats and tiedSeats are already correct since we assign *all* seats with value a*
             return new Apportionment(instance.k, seats, new int[n], D);
         } else {
             if (sumSeats < instance.k) {
@@ -94,27 +90,25 @@ public class PukelsheimPQ extends IterativeMethod {
             }
 
 
-            // Initialize heap
-            final PriorityQueue<Entry> heap = new PriorityQueue<>(n,
-                    new Comparator<Entry>() {
-                        @Override
-                        public int compare(final Entry e1, final Entry e2) {
-                            return order * Double.compare(e1.value, e2.value);
-                        }
-                    });
+            // Initialize current values
+            final double[] values = new double[n];
 
-            // Seed heap with initial values
+            // Seed list with initial values
             for (int i = 0; i < n; i++) {
-                heap.add(new Entry(i, d(seats[i] + offset) / instance.votes[i]));
+                values[i] = d(seats[i] + offset) / instance.votes[i];
             }
 
-            // Subsequently adapt seats
+            // Subsequently assign seats
+            int im;
             while (sumSeats != instance.k) {
-                final Entry e = heap.poll();
-                final int i = e.index;
-                seats[i] += step;
-                e.value = d(seats[i] + offset) / instance.votes[i];
-                heap.add(e);
+                // Find index with maximum value
+                im = 0;
+                for (int i = 1; i < n; i++) {
+                    if (order * values[i] < order * values[im]) im = i;
+                }
+
+                seats[im] += step;
+                values[im] = d(seats[im] + offset) / instance.votes[im];
                 sumSeats += step;
             }
 
@@ -126,16 +120,6 @@ public class PukelsheimPQ extends IterativeMethod {
             }
 
             return determineTies(instance.k, seats, astar);
-        }
-    }
-
-    private static class Entry {
-        final int index;
-        double value;
-
-        Entry(int index, double value) {
-            this.index = index;
-            this.value = value;
         }
     }
 }

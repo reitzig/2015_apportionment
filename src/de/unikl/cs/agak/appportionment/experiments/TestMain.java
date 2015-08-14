@@ -44,6 +44,7 @@ public class TestMain {
     private static List<Class<? extends LinearApportionmentMethod>> algs = Arrays.asList(
             IterativeDMLS.class,
             IterativeDMPQ.class,
+            PukelsheimLS.class,
             PukelsheimPQ.class,
             AStarChengEppstein.class,
             SelectAStar.class,
@@ -177,7 +178,7 @@ public class TestMain {
             }
 
             if ( correct ) {
-                System.out.println(alg.getSimpleName() + "is correct. Hopefully.");
+                System.out.println(alg.getSimpleName() + " is correct. Hopefully.");
             }
         }
     }

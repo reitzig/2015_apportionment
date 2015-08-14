@@ -18,7 +18,7 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
-public class IterativeDMLS extends LinearApportionmentMethod {
+public class IterativeDMLS extends IterativeMethod {
 
     public IterativeDMLS(final double alpha, final double beta) {
         super(alpha, beta);
@@ -61,9 +61,6 @@ public class IterativeDMLS extends LinearApportionmentMethod {
         final double astar = values[imin];
         seats[imin]++;
 
-        int[] tiedSeats = new int[n];
-        // TODO find tied seats!
-
-        return new Apportionment(instance.k, seats, tiedSeats, astar);
+        return determineTies(instance.k, seats, astar);
     }
 }

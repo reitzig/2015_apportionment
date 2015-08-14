@@ -21,7 +21,7 @@ import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-public class IterativeDMPQ extends LinearApportionmentMethod {
+public class IterativeDMPQ extends IterativeMethod {
 
     public IterativeDMPQ(final double alpha, final double beta) {
         super(alpha, beta);
@@ -61,11 +61,7 @@ public class IterativeDMPQ extends LinearApportionmentMethod {
         final Entry e = heap.poll();
         seats[e.index]++;
 
-        int[] tiedSeats = new int[n];
-        // TODO find tied seats!
-
-        // Next element determines the last seat
-        return new Apportionment(instance.k, seats, tiedSeats, e.value);
+        return determineTies(instance.k, seats, e.value);
     }
 
     private static class Entry {

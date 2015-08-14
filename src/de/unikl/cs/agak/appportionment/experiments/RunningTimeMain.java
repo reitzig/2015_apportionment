@@ -284,6 +284,7 @@ public class RunningTimeMain {
         algorithms.put("AStarChengEppstein", AStarChengEppstein.class);
         algorithms.put("IterativeDMLS", IterativeDMLS.class);
         algorithms.put("IterativeDMPQ", IterativeDMPQ.class);
+        algorithms.put("PukelsheimLS", PukelsheimLS.class);
         algorithms.put("PukelsheimPQ", PukelsheimPQ.class);
 
         abbreviations.put("naive", "SelectAstarNaive");
@@ -292,6 +293,7 @@ public class RunningTimeMain {
         abbreviations.put("ce", "AStarChengEppstein");
         abbreviations.put("dmpq", "IterativeDMPQ");
         abbreviations.put("dmls", "IterativeDMLS");
+        abbreviations.put("puls", "PukelsheimLS");
         abbreviations.put("pupq", "PukelsheimPQ");
     }
 

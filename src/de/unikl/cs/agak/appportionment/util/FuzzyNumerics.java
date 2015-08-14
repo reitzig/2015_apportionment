@@ -19,7 +19,7 @@ package de.unikl.cs.agak.appportionment.util;
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
 public class FuzzyNumerics {
-    public static final double EPSILON = 1E-14;
+    public static final double EPSILON = 1E-14;      // TODO these *should* be private
     public static final long MANTISSA_EPSILON = 16L;
 
     /**
