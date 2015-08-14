@@ -61,6 +61,6 @@ public class IterativeDMLS extends IterativeMethod {
         final double astar = values[imin];
         seats[imin]++;
 
-        return determineTies(instance.k, seats, astar);
+        return determineTies(instance, seats, astar);
     }
 }

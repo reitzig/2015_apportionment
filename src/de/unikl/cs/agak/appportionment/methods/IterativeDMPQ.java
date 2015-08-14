@@ -61,7 +61,7 @@ public class IterativeDMPQ extends IterativeMethod {
         final Entry e = heap.poll();
         seats[e.index]++;
 
-        return determineTies(instance.k, seats, e.value);
+        return determineTies(instance, seats, e.value);
     }
 
     private static class Entry {

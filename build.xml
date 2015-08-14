@@ -33,7 +33,7 @@
       <assertions>
         <enable/>
       </assertions>
-      <arg value="1439483575596"/>
+      <!-- <arg value="insert seed for reproducing tests"/> -->
     </java>
   </target>
 

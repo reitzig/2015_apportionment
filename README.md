@@ -3,6 +3,13 @@
 This repository contains implementations of algorithms for proportional 
 apportionment with divisor methods. Inspect and use at your own risk.
 
+ * File [`SelectAStar.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SelectAStar.java)
+  contains an implementation of the algorithm we have presented in
+
+  > Wild, S. and Reitzig, R.  
+  > A Simple and Fast Linear-Time Algorithm for Proportional Apportionment  
+  > [[preprint](http://arxiv.org/abs/1504.06475) (v1,2015)]
+
  * In [`AStarChengEppstein.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/AStarChengEppstein.java)
   we provide an implementation of the algorithm proposed in
 
@@ -12,20 +19,13 @@ apportionment with divisor methods. Inspect and use at your own risk.
   > Springer (2014)  
   > [[preprint](http://arxiv.org/abs/1409.2603) (v1,2014)]
 
- * File [`SelectAStar.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SelectAStar.java)
-  contains an implementation of the algorithm we have presented in
-
-  > Wild, S. and Reitzig, R.  
-  > A Simple and Fast Linear-Time Algorithm for Proportional Apportionment  
-  > [[preprint](http://arxiv.org/abs/1504.06475) (v1,2015)]
-
  * Furthermore, we implement the jump-and-step algorithm from
 
   > Pukelsheim, F.  
   > Proportional Representation  
   > Springer, 2014
 
-  in [`PukelsheimPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SelectAStar.java).
+  in [`PukelsheimPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/PukelsheimPQ.java) with priority queues for determining the next party to modify, and in [`PukelsheimLS.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/PukelsheimLS.java) using linear scan.
 
  * Finally, we give implementations of the naive algorithm using
   priority queues resp. a linear scan for finding maxima in
@@ -48,9 +48,13 @@ Execute `ant compile`; you will need [`stdlib-package.jar`](http://algs4.cs.prin
 
 ### Usage
 
-Run `ant test` for basic correctness testing.
+Run `ant test` for testing correctness of the implementations.
+Besides rudimentary sanity checks, the test basically check Pukelsheim's 
+min-max-inequality for *all* computed assignments, 
+i.e. for all ways to resolve ties.
+
 Command `ant run` executes a sample runtime experiment.
 
 Run your own experiments by defining the parameters in a space-separated file
-(e.g. [arxiv.experiment](https://github.com/reitzig/2015_apportionment/blob/master/arxiv.experiment); those are the one from the article)
+(see e.g. [arxiv.experiment](https://github.com/reitzig/2015_apportionment/blob/master/arxiv.experiment); those are the ones from the article)
 and passing it as parameter to [`run_experiments.rb`](https://github.com/reitzig/2015_apportionment/blob/master/run_experiments.rb).

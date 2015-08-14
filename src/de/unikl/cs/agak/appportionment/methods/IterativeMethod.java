@@ -18,6 +18,8 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.closeToEqual;
+
 /**
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
@@ -29,11 +31,24 @@ abstract public class IterativeMethod extends LinearApportionmentMethod {
 
     abstract public Apportionment apportion(ApportionmentInstance instance);
 
-    Apportionment determineTies(final int k, final int[] seats, final double astar) {
+    Apportionment determineTies(final ApportionmentInstance instance, final int[] seats, final double astar) {
         final int[] tiedSeats = new int[seats.length];
 
-        // TODO implement
+        // TODO can we do this faster?
+        for (int i = 0; i < seats.length; i++) {
+            if ( closeToEqual(astar, d(seats[i] - 1) / instance.votes[i]) ) {
+                // Party i got a seat with value astar
+                seats[i] -= 1;
+                tiedSeats[i] = 1;
+            }
+            else if ( closeToEqual(astar, d(seats[i]) / instance.votes[i]) ) {
+                // Party i did *not* did also have value astar but did not get a seat
+                // Note how we don't have to check the current value since the sequences are
+                // incresing.
+                tiedSeats[i] = 1;
+            }
+        }
 
-        return new Apportionment(k, seats, tiedSeats, astar);
+        return new Apportionment(instance.k, seats, tiedSeats, astar);
     }
 }

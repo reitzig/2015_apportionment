@@ -119,7 +119,7 @@ public class PukelsheimLS extends IterativeMethod {
                 if (cand > astar) astar = cand;
             }
 
-            return determineTies(instance.k, seats, astar);
+            return determineTies(instance, seats, astar);
         }
     }
 }
