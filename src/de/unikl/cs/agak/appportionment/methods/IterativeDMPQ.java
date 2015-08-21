@@ -18,7 +18,7 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.PriorityQueue;
 
 public class IterativeDMPQ extends IterativeMethod {
@@ -32,18 +32,11 @@ public class IterativeDMPQ extends IterativeMethod {
         final int n = instance.votes.length;
 
         // Initialize heap
-        final PriorityQueue<Entry> heap = new PriorityQueue<>(n,
-                new Comparator<Entry>() {
-                    @Override
-                    public int compare(final Entry e1, final Entry e2) {
-                        return Double.compare(e1.value, e2.value);
-                    }
-                });
-
-        // Seed heap with initial values
+        final ArrayList<Entry> initials = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            heap.add(new Entry(i, d(0) / instance.votes[i]));
+            initials.add(new Entry(i, d(0) / instance.votes[i]));
         }
+        final PriorityQueue<Entry> heap = new PriorityQueue<>(initials);
 
         // Subsequently assign seats
         final int[] seats = new int[n];
@@ -64,13 +57,18 @@ public class IterativeDMPQ extends IterativeMethod {
         return determineTies(instance, seats, e.value);
     }
 
-    private static class Entry {
+    private static class Entry implements Comparable<Entry> {
         final int index;
         double value;
 
         Entry(int index, double value) {
             this.index = index;
             this.value = value;
+        }
+
+        @Override
+        public int compareTo(final Entry e) {
+            return Double.compare(this.value, e.value);
         }
     }
 }

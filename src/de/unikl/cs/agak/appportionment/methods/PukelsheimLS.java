@@ -57,7 +57,7 @@ public class PukelsheimLS extends IterativeMethod {
            * which normalizes to
            *    s(n) = n - 1 + beta/alpha.
            */
-            D = (instance.k + n * (beta / alpha - 0.5)) / (sumPop);
+            D = (instance.k + n * (beta / alpha - 0.5)) / sumPop;
         } else {
             // Fallback to the universal estimator
             D = instance.k / sumPop;
@@ -69,6 +69,7 @@ public class PukelsheimLS extends IterativeMethod {
         }
 
         int sumSeats = sum(seats);
+        // TODO log instance.k - sumSeats
 
         final int order;
         final int offset;

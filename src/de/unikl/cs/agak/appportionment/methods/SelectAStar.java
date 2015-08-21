@@ -40,8 +40,7 @@ public class SelectAStar extends SelectionBasedMethod {
             if (p > maxPop) maxPop = p;
 		}
         double x_overbar = d(instance.k - 1) / maxPop + 5 * EPSILON;
-        // xoverbar clearly feasible and suboptimal
-//		System.out.println("x_overbar = " + x_overbar);
+        // x_overbar clearly feasible and suboptimal
 
 		Collection<Integer> I_x_overbar = new LinkedList<>();
 		double Sigma_I_x_overbar = 0;
@@ -56,14 +55,13 @@ public class SelectAStar extends SelectionBasedMethod {
                 (alpha * instance.k + beta * I_x_overbar.size()) / Sigma_I_x_overbar;
         final double a_underbar = Math.max(0,
 			  a_overbar - ((alpha + beta) * I_x_overbar.size()) / Sigma_I_x_overbar);
-//		System.out.println("a_underbar = " + a_underbar);
-//		System.out.println("a_overbar = " + a_overbar);
 
 		final int A_hat_bound = (int) Math.ceil(
 			  2 * (1 + beta / alpha) * I_x_overbar.size());
 
 		// step 6
 		final double[] A_hat = new double[A_hat_bound];
+        // TODO how is this better than just using an ArrayLlist?
 
 		int A_hat_size = 0;
         int k_hat = instance.k;
@@ -83,10 +81,8 @@ public class SelectAStar extends SelectionBasedMethod {
 			}
 			k_hat -= minJ; // Elements 0,1,...,minJ-1 missing from A_hat
 		}
-//		Arrays.sort(A_hat,0,A_hat_size);
-//		System.out.println("A_hat = " + Arrays.toString(A_hat));
-//		System.out.println("A_hat_size = " + A_hat_size);
-//		System.out.println("k_hat = " + k_hat);
+
+        // TODO log A_hat_size()
 
 		// Selection algorithm is zero-based!
 		return RankSelection.select(A_hat, A_hat_size - 1, k_hat - 1);

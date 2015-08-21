@@ -18,6 +18,7 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -61,7 +62,7 @@ public class PukelsheimPQ extends IterativeMethod {
            * which normalizes to
            *    s(n) = n - 1 + beta/alpha.
            */
-            D = (instance.k + n * (beta / alpha - 0.5)) / (sumPop);
+            D = (instance.k + n * (beta / alpha - 0.5)) / sumPop;
         } else {
             // Fallback to the universal estimator
             D = instance.k / sumPop;
@@ -73,8 +74,9 @@ public class PukelsheimPQ extends IterativeMethod {
         }
 
         int sumSeats = sum(seats);
+        // TODO log instance.k - sumSeats
 
-        final int order;
+        final Comparator<Entry> order;
         final int offset;
         final int step;
         if (sumSeats == instance.k) {
@@ -83,30 +85,33 @@ public class PukelsheimPQ extends IterativeMethod {
         } else {
             if (sumSeats < instance.k) {
                 // Setup: max-heap, offset for next d_i, add seats
-                order = 1;
+                order = new Comparator<Entry>() {
+                    @Override
+                    public int compare(final Entry e1, final Entry e2) {
+                        return Double.compare(e1.value, e2.value);
+                    }
+                };
                 offset = 0;
                 step = +1;
             } else { // s > k
                 // Setup: min-heap, offset for previous d_i, remove seats
-                order = -1;
+                order = new Comparator<Entry>() {
+                    @Override
+                    public int compare(final Entry e1, final Entry e2) {
+                        return -Double.compare(e1.value, e2.value);
+                    }
+                };
                 offset = -1;
                 step = -1;
             }
 
 
             // Initialize heap
-            final PriorityQueue<Entry> heap = new PriorityQueue<>(n,
-                    new Comparator<Entry>() {
-                        @Override
-                        public int compare(final Entry e1, final Entry e2) {
-                            return order * Double.compare(e1.value, e2.value);
-                        }
-                    });
-
-            // Seed heap with initial values
+            final ArrayList<Entry> initials = new ArrayList<>(n);
             for (int i = 0; i < n; i++) {
-                heap.add(new Entry(i, d(seats[i] + offset) / instance.votes[i]));
+                initials.add(new Entry(i, d(seats[i] + offset) / instance.votes[i], order));
             }
+            final PriorityQueue<Entry> heap = new PriorityQueue<>(initials);
 
             // Subsequently adapt seats
             while (sumSeats != instance.k) {
@@ -129,13 +134,20 @@ public class PukelsheimPQ extends IterativeMethod {
         }
     }
 
-    private static class Entry {
+    private static class Entry implements Comparable<Entry> {
+        final Comparator<Entry> order;
         final int index;
         double value;
 
-        Entry(int index, double value) {
+        Entry(int index, double value, Comparator<Entry> order) {
             this.index = index;
             this.value = value;
+            this.order = order;
+        }
+
+        @Override
+        public int compareTo(final Entry e) {
+            return order.compare(this, e);
         }
     }
 }
