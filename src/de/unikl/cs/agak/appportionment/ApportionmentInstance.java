@@ -18,10 +18,14 @@ package de.unikl.cs.agak.appportionment;
 import java.util.Arrays;
 
 /**
+ * In instance of the apportionment problem, i.e. a list of vote counts and a target house size.
  * @author Sebastian Wild (s_wild@cs.uni-kl.de)
  */
 public class ApportionmentInstance {
-    final public double[] votes;
+    final public double[] votes; // TODO not safe
+    /**
+     * The house size.
+     */
     final public int k;
 
     public ApportionmentInstance(final double[] votes, final int k) {

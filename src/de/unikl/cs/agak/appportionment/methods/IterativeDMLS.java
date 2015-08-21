@@ -18,6 +18,10 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
+/**
+ * A naive implementation of divisor methods that assigns one seat after the other
+ * using linear scan for each step.
+ */
 public class IterativeDMLS extends IterativeMethod {
 
     public IterativeDMLS(final double alpha, final double beta) {

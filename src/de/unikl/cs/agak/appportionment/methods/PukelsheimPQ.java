@@ -17,6 +17,7 @@ package de.unikl.cs.agak.appportionment.methods;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.experiments.AlgorithmWithCounter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,16 +28,20 @@ import static edu.princeton.cs.introcs.StdStats.sum;
 
 /**
  * Implements the jump-and-step algorithm from
- * <p/>
- * Friedrich Pukelsheim
- * Proportional Representation
- * Springer, 2014
- * <p/>
+ * <dir>
+ * Friedrich Pukelsheim<br/>
+ * Proportional Representation<br/>
+ * Springer, 2014<br/>
+ * </dir>
  * The implementation uses a priority queue for (asymptotically) efficient steps.
  *
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-public class PukelsheimPQ extends IterativeMethod {
+public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounter {
+    /* Interface AlgorithmWithCounter and this member variable are only
+     * for purposes of experiments. In a productive environment, remove both.
+     */
+    private int lastCounter = -1;
 
     public PukelsheimPQ(final double alpha, final double beta) {
         super(alpha, beta);
@@ -53,15 +58,8 @@ public class PukelsheimPQ extends IterativeMethod {
         double sumPop = sum(instance.votes);
 
         final double D;
-        if (beta <= alpha) {
-          /* In this case, we have a stationary divisor method and
-           * can use Pukelsheim's recommended divisor (cf section 6.1),
-           * resp. it's reciprocal.
-           * Note that r = alpha/beta follows from
-           *    s(n+1) = d_n = alpha * n + beta
-           * which normalizes to
-           *    s(n) = n - 1 + beta/alpha.
-           */
+        if ( isStationary() ) {
+            // Use recommended estimator (cf Pukelsheim, section 6.1) resp. its reciprocal
             D = (instance.k + n * (beta / alpha - 0.5)) / sumPop;
         } else {
             // Fallback to the universal estimator
@@ -74,7 +72,7 @@ public class PukelsheimPQ extends IterativeMethod {
         }
 
         int sumSeats = sum(seats);
-        // TODO log instance.k - sumSeats
+        lastCounter = instance.k - sumSeats;
 
         final Comparator<Entry> order;
         final int offset;
@@ -132,6 +130,16 @@ public class PukelsheimPQ extends IterativeMethod {
 
             return determineTies(instance, seats, astar);
         }
+    }
+
+    @Override
+    public int getLastCounter() {
+        return lastCounter;
+    }
+
+    @Override
+    public String getCounterLabel() {
+        return "missingSeats";
     }
 
     private static class Entry implements Comparable<Entry> {

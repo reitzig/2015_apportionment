@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package de.unikl.cs.agak.appportionment.methods;
 
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.experiments.AlgorithmWithCounter;
 import de.unikl.cs.agak.appportionment.util.RankSelection;
 
 import java.util.Collection;
@@ -24,7 +25,19 @@ import java.util.LinkedList;
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
 
 
-public class SelectAStar extends SelectionBasedMethod {
+/**
+ * Implements the linear-time apportionment algorithm from
+ * <dir>
+ *     Reitzig, R. and Wild, S.<br/>
+ *     A Simple and Fast Linear-Time Algorithm for Proportional Apportionment<br/>
+ *     arXiv:1504.06475 (2015)
+ * </dir>
+ */
+public class SelectAStar extends SelectionBasedMethod implements AlgorithmWithCounter {
+    /* Interface AlgorithmWithCounter and this member variable are only
+     * for purposes of experiments. In a productive environment, remove both.
+     */
+    private int lastCounter = -1;
 
 	public SelectAStar(final double alpha, final double beta) {
 		super(alpha, beta);
@@ -82,10 +95,19 @@ public class SelectAStar extends SelectionBasedMethod {
 			k_hat -= minJ; // Elements 0,1,...,minJ-1 missing from A_hat
 		}
 
-        // TODO log A_hat_size()
+        lastCounter = A_hat_size;
 
 		// Selection algorithm is zero-based!
 		return RankSelection.select(A_hat, A_hat_size - 1, k_hat - 1);
 	}
 
+    @Override
+    public int getLastCounter() {
+        return lastCounter;
+    }
+
+    @Override
+    public String getCounterLabel() {
+        return "nrCands";
+    }
 }

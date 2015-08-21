@@ -37,13 +37,13 @@ public final class Apportionment {
     /**
      * The number of seats per party we definitely assign.
      */
-    public final int[] seats;
+    public final int[] seats; // TODO not safe
     /**
      * Contains 1 for every party the <em>tied</em> for the last couple of seats.
      * You can pick any <code>k - sum(seats)</code> of these and assign one seat each;
      * no assignment is more "fair" than any other according to the used divisor method.
      */
-    public final int[] tiedSeats;
+    public final int[] tiedSeats; // TODO not safe
     /**
      * The number of seats we have apportioned for.
      */

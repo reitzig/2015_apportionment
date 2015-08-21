@@ -18,34 +18,82 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
+/**
+ * A divisor method whose divisor sequence is linear, i.e.
+ * conforms to <code>a*j + b</code> for some constants
+ * <code>a</code> and <code>b</code>.
+ */
 public abstract class LinearApportionmentMethod {
     final double alpha;
     final double beta;
 
+    /**
+     * Creates a new instance of a divisor method with
+     * <code>d(j) = alpha * j + beta</code> (for <code>j >= 0</code>).
+     * @param alpha The factor.
+     * @param beta The offset.
+     */
     public LinearApportionmentMethod(double alpha, double beta) {
         this.alpha = alpha;
         this.beta = beta;
     }
 
+    /**
+     * @param j Index in the divisor sequence
+     * @return The value <code>d(j) = alpha * j + beta</code> for <code>j >= 0</code>,
+     *          negative infinity otherwise.
+     */
     public final double d(int j) {
         if (j < 0) {
             // By convention (cf. article) we return -infty for negative values.
-            return Double.MIN_VALUE;
+            return Double.MIN_VALUE; // TODO we would want to use Double.NEGATIVE_INFINITY, but that breaks the algorithms?
         }
 
         return alpha * j + beta;
     }
 
+    /**
+     * Computes the inverse function of the canonical continuation of
+     * {@link LinearApportionmentMethod#d(int)}
+     * @param x Some number
+     * @return <code>(x - beta) / alpha</code>
+     */
     public final double deltaInv(double x) {
+        // TODO don't we have to take care of negative parameters?
         return (x - beta) / alpha;
     }
 
     /**
-     * Finds an apportionment for the given parameters.
+     * Finds the apportionment for the given parameters.
      * @param instance An instance of the apportionment problem, consisting of
      *                 votes and house size.
+     * @return The apportionment for the given instance, representing all
+     *          seats assignment that are valid w.r.t. this divisor method.
      */
     public abstract Apportionment apportion(ApportionmentInstance instance);
+
+    /**
+     * Determines if this method uses a <em>stationary</em> divisor sequence as defined
+     * by Pukelsheim. Note that r = <code>beta</code>/<code>alpha</code> if this quotient
+     * is in [0,1]; that is, for instance,
+     * <ul>
+     *     <li><code>alpha = 1</code> and <code>beta = 1</code> correspond to downward rounding (r=1),</li>
+     *     <li><code>alpha = 2</code> and <code>beta = 1</code> correspond to standard rounding (r=1/2), and </li>
+     *     <li><code>alpha = 1</code> and <code>beta = 0</code> correspond to upward rounding (r=0).</li>
+     * </ul>
+     * Above identity follows from
+     * <dir>
+     *     s(n+1) = d_n = <code>alpha</code> * n + <code>beta</code>
+     * </dir>
+     * which normalizes to
+     * <dir>
+     *    s(n) = n - 1 + <code>beta</code>/<code>alpha</code>.
+     * </dir>
+     * @return <code>true</code> iff this method is stationary.
+     */
+    public boolean isStationary() {
+        return 0 <= beta / alpha && beta / alpha <= 1;
+    }
 
     @Override
     public String toString() {

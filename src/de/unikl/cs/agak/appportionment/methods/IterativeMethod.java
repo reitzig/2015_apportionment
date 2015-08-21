@@ -31,6 +31,14 @@ abstract public class IterativeMethod extends LinearApportionmentMethod {
 
     abstract public Apportionment apportion(ApportionmentInstance instance);
 
+    /**
+     * Given <em>one</em> valid seat assignment, determine all possible ones
+     * that result from different tie-breaking.
+     * @param instance The original apportionment instance.
+     * @param seats A valid seat assignment.
+     * @param astar The (reciprocal of) the proportionality constant.
+     * @return A symbolic representation of all valid seat assignments for the given instance.
+     */
     Apportionment determineTies(final ApportionmentInstance instance, final int[] seats, final double astar) {
         final int[] tiedSeats = new int[seats.length];
 

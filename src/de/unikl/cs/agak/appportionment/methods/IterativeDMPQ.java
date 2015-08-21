@@ -21,6 +21,10 @@ import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 
+/**
+ * A naive implementation of divisor methods that assigns one seat after the other
+ * using a priority queue for each step.
+ */
 public class IterativeDMPQ extends IterativeMethod {
 
     public IterativeDMPQ(final double alpha, final double beta) {

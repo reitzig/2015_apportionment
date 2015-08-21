@@ -28,11 +28,13 @@ import java.text.DateFormat;
 import java.util.*;
 
 /**
- * @author Sebastian Wild (s_wild@cs.uni-kl.de)
+ * Executes running time experiments for all divisor method implementations in
+ * {@link de.unikl.cs.agak.appportionment.methods}.
+ * @author Sebastian Wild (wild@cs.uni-kl.de)
  */
 public class RunningTimeMain {
 
-    static String SEP = "\t";
+    private static String SEP = "\t";
 
     /**
      * Writes a line of strings separated by {@link #SEP} to the given stream, and flushes it.
@@ -144,7 +146,7 @@ public class RunningTimeMain {
         try {
             out = new BufferedWriter(new FileWriter("times-" + name + ".tab"));
             writeSeparatedLine(out, "algo", "n", "k", "input-nr", "1/unit-size", "repetitions",
-                "total-ms", "single-run-ms", "single-run-ms/n",
+                "total-ms", "single-run-ms", "single-run-ms/n", "counter",
                 "input-type", "alpha", "beta", "seed", "ns");
 
             avgOut = new BufferedWriter(new FileWriter("avgtimes-" + name + ".tab"));
@@ -190,10 +192,11 @@ public class RunningTimeMain {
 
                         writeSeparatedLine(out, algoName, String.valueOf(n), String.valueOf(input.k), String.valueOf(inputNr),
                                 String.valueOf(1 / app.astar), String.valueOf(repetitions), String.valueOf(millis),
-                                String.valueOf(perRunMillis), String.valueOf(perRunMillis / n), inputType,
-                                String.valueOf(alpha), String.valueOf(beta), String.valueOf(seed),
+                                String.valueOf(perRunMillis), String.valueOf(perRunMillis / n),
+                                String.valueOf(alg instanceof AlgorithmWithCounter ? ((AlgorithmWithCounter)alg).getLastCounter() : -1),
+                                inputType, String.valueOf(alpha), String.valueOf(beta), String.valueOf(seed),
                                 "\"" + ns.toString().replaceAll("\\s+", "") + "\"");
-                        System.out.print("\33[1A\33[2K"); // Overwrite "inputNr=..." line
+                        System.out.print("\33[1A\33[2K"); // Overwrite "inputNr=..." line so the shell is not totally swamped
                     }
 
                     writeSeparatedLine(avgOut, algoName, String.valueOf(n),

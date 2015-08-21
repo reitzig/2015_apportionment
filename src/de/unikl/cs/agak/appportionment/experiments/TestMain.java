@@ -30,6 +30,9 @@ import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
 import static edu.princeton.cs.introcs.StdStats.sum;
 
 /**
+ * Executes basic plausibility and mathematical correctness tests of all
+ * the divisor method implementations given in {@link de.unikl.cs.agak.appportionment.methods}.
+ * Correctness is established via the min-max-inequality (Pukelsheim Theorem 4.5).
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
 public class TestMain {
@@ -64,7 +67,7 @@ public class TestMain {
         for ( int i=0; i<REPS; i++ ) {
             final ApportionmentInstance inst = ApportionmentInstanceFactory.uniformRandomInstance(r, r.uniform(MIN_N, MAX_N), kFactory);
             final double alpha = r.uniform(MIN_ALPHA, MAX_ALPHA);
-            tests.add(new ApportionmentInstanceWithMethod(inst.votes, inst.k, alpha, r.uniform(0.0, alpha)));
+            tests.add(new ApportionmentInstanceWithMethod(inst.votes, inst.k, alpha, r.uniform(0.0, 1.5 * alpha)));
         }
 
         // Test all combinations of algorithm and instance
@@ -171,8 +174,49 @@ public class TestMain {
                     }
                 }
 
+                // Verify that the counters (if any) make sense
+                if ( algInst instanceof AlgorithmWithCounter ) {
+                    final AlgorithmWithCounter awc = (AlgorithmWithCounter)algInst;
+
+                    if ( "missingSeats".equals(awc.getCounterLabel()) ) {
+                        /* This is a Pukelsheim implementation. It should never have more than
+                         * n resp. floor(n/2) seats missing or too many. */
+                        final int divisor = algInst.isStationary() ? 2 : 1;
+                        if ( Math.abs(awc.getLastCounter()) > inst.votes.length / divisor ) {
+                            errors.add("Estimator is off by too much"
+                                    + (algInst.isStationary() ? " for a stationary method" : "")
+                                    + "; missed house size by " + awc.getLastCounter() + ".");
+                            correct = false;
+                        }
+                    }
+                    else if ( "nrCands".equals(awc.getCounterLabel()) ) {
+                        /* This is SelectAStar. Check against the proven upper size bound. */
+                        // TODO can we guess/recompute |I_x| externally?
+                        if ( algInst.isStationary() ) {
+                            // Stationary method; upper bound 2n
+                            if ( awc.getLastCounter() > 2 * inst.votes.length ) {
+                                errors.add("Candidate set too large for stationary method: "
+                                        + awc.getLastCounter());
+                                correct = false;
+                            }
+                        }
+                        else {
+                            // General bound of 2 * (1 + beta/alpha) * n
+                            if ( awc.getLastCounter() > 2 * (1 + inst.beta / inst.alpha) * inst.votes.length ) {
+                                errors.add("Candidate set too large: "
+                                        + awc.getLastCounter());
+                                correct = false;
+                            }
+                        }
+                    }
+                    else {
+                        errors.add("Untested counter '" + awc.getCounterLabel() + "'");
+                        correct = false;
+                    }
+                }
+
                 if (!correct) {
-                    printError(errors, alg.getSimpleName(), inst, result);
+                    printError(errors, algInst, inst, result);
                     break;
                 }
             }

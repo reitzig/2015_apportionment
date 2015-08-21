@@ -21,6 +21,7 @@ import de.unikl.cs.agak.appportionment.util.SedgewickRandom;
 import java.util.Arrays;
 
 /**
+ * Samples apportionment instances randomly.
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
 public class ApportionmentInstanceFactory {

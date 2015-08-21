@@ -20,7 +20,7 @@ package de.unikl.cs.agak.appportionment.util;
  */
 public class FuzzyNumerics {
     public static final double EPSILON = 1E-14;      // TODO these *should* be private
-    public static final long MANTISSA_EPSILON = 16L;
+    private static final long MANTISSA_EPSILON = 16L;
 
     /**
      * @return true iff x is within {@link #EPSILON} of an integer

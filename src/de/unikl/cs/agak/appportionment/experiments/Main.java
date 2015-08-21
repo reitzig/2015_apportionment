@@ -28,8 +28,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 class Main {
 	public static void main(String[] args) throws Exception {
+        System.out.println("THIS TEST IS DEPRECATED. USE TestMain INSTEAD!");
 
 		smallExample();
 

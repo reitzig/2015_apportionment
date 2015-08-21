@@ -25,13 +25,13 @@ import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.closeToEqual;
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyFloor;
 
 /**
- * Implements the algorithm presented in
- * <p>
- * Cheng, Z., Eppstein, D.<br/>
+ * Implements the linear-time apportionment algorithm presented in
+ * <dir>
+ * Cheng, Z. and Eppstein, D.<br/>
  * Linear-time Algorithms for Proportional Apportionment. <br/>
  * In: International Symposium on Algorithms and Computation (ISAAC) 2014. <br/>
  * Springer (2014)
- * </p>
+ * </dir>
  *
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
