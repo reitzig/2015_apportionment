@@ -181,6 +181,7 @@ public class TestMain {
                     if ( "missingSeats".equals(awc.getCounterLabel()) ) {
                         /* This is a Pukelsheim implementation. It should never have more than
                          * n resp. floor(n/2) seats missing or too many. */
+                        // TODO realistic? We do fuzzy stuff, after all
                         final int divisor = algInst.isStationary() ? 2 : 1;
                         if ( Math.abs(awc.getLastCounter()) > inst.votes.length / divisor ) {
                             errors.add("Estimator is off by too much"
@@ -194,6 +195,7 @@ public class TestMain {
                         // TODO can we guess/recompute |I_x| externally?
                         if ( algInst.isStationary() ) {
                             // Stationary method; upper bound 2n
+                            // TODO realistic? We do fuzzy stuff, after all
                             if ( awc.getLastCounter() > 2 * inst.votes.length ) {
                                 errors.add("Candidate set too large for stationary method: "
                                         + awc.getLastCounter());

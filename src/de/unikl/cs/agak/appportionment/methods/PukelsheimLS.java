@@ -19,7 +19,6 @@ import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.experiments.AlgorithmWithCounter;
 
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.EPSILON;
 import static edu.princeton.cs.introcs.StdStats.sum;
 
 /**
@@ -47,7 +46,7 @@ public class PukelsheimLS extends IterativeMethod implements AlgorithmWithCounte
     public Apportionment apportion(final ApportionmentInstance instance) {
         final int n = instance.votes.length;
 
-        // Compute initial assignment using guess sum(population)/k
+        // Compute initial assignment
         final int[] seats = new int[n];
 
         double sumPop = sum(instance.votes);
@@ -55,15 +54,14 @@ public class PukelsheimLS extends IterativeMethod implements AlgorithmWithCounte
         final double D;
         if ( isStationary() ) {
             // Use recommended estimator (cf Pukelsheim, section 6.1) resp. its reciprocal
-            D = (instance.k + n * (beta / alpha - 0.5)) / sumPop;
+            D = alpha * (instance.k + n * (beta / alpha - 0.5)) / sumPop;
         } else {
             // Fallback to the universal estimator
-            D = instance.k / sumPop;
+            D = alpha * instance.k / sumPop;
         }
 
         for (int i = 0; i < n; i++) {
-            seats[i] = (int) Math.floor(deltaInv(instance.votes[i] * D) + EPSILON) + 1;
-            // TODO correct? use fuzzy floor when it can deal with negative parameters?
+            seats[i] = dRound(instance.votes[i] * D) + 1;
         }
 
         int sumSeats = sum(seats);
