@@ -18,6 +18,8 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.EPSILON;
+
 /**
  * A divisor method whose divisor sequence is linear, i.e.
  * conforms to <code>a*j + b</code> for some constants
@@ -66,6 +68,19 @@ public abstract class LinearApportionmentMethod {
     public final double deltaInv(double x) {
         // TODO don't we have to take care of negative parameters?
 	    return x < beta ? -0.5 : (x - beta) / alpha;
+    }
+
+    /**
+     * Rounds the given value according to the rounding method implied by the
+     * divisor sequence d induced by this method.
+     *
+     * @param x Number to d-round
+     * @return The index <code>j</code> in the divisor sequence for which <code>d(j) <= x < d(j+1)</code>,
+     * that is an integer from at least -1.
+     */
+    public final int dRound(final double x) {
+        // TODO correct? use fuzzy floor when it can deal with negative parameters?
+        return Math.max(-1, (int) Math.floor(deltaInv(x) + EPSILON));
     }
 
     /**

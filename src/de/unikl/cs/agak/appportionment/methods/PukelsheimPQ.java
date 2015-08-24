@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.EPSILON;
 import static edu.princeton.cs.introcs.StdStats.sum;
 
 /**
@@ -53,7 +52,7 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
     public Apportionment apportion(final ApportionmentInstance instance) {
         final int n = instance.votes.length;
 
-        // Compute initial assignment using guess sum(population)/k
+        // Compute initial assignment
         final int[] seats = new int[n];
 
         double sumPop = sum(instance.votes);
@@ -71,8 +70,7 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
         }
 
         for (int i = 0; i < n; i++) {
-            seats[i] = (int) Math.floor(deltaInv(instance.votes[i] * D) + EPSILON) + 1;
-            // TODO use fuzzy floor when it can deal with negative parameters
+            seats[i] = dRound(instance.votes[i] * D) + 1;
         }
 
         int sumSeats = sum(seats);

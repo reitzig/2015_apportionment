@@ -18,7 +18,6 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.EPSILON;
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.closeToEqual;
 
 /**
@@ -39,8 +38,7 @@ abstract public class SelectionBasedMethod extends LinearApportionmentMethod {
         // Derive seats
         final int[] seats = new int[n];
         for (int i = 0; i < n; i++) {
-            seats[i] = (int) Math.floor(deltaInv(instance.votes[i] * astar) + EPSILON) + 1;
-            // TODO use fuzzy floor when it can deal with negative parameters? Or just add 1 before rounding?
+            seats[i] = dRound(instance.votes[i] * astar) + 1;
         }
 
         // Now we have *all* seats with value astar, which may be too many.
