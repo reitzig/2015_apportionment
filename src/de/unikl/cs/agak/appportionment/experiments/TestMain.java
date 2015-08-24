@@ -68,8 +68,13 @@ public class TestMain {
             final ApportionmentInstance inst = ApportionmentInstanceFactory.uniformRandomInstance(r, r.uniform(MIN_N, MAX_N), kFactory);
             final double alpha = r.uniform(MIN_ALPHA, MAX_ALPHA);
             final double beta = r.uniform(0.0, 1.5 * alpha);
+//	        System.out.println("alpha = " + alpha);
+//	        System.out.println("beta = " + beta);
             tests.add(new ApportionmentInstanceWithMethod(inst.votes, inst.k, alpha, beta));
         }
+
+//	    System.out.println("tests = " + tests);
+
 
         // Test all combinations of algorithm and instance
         for ( Class<? extends LinearApportionmentMethod> alg : algs ) {
@@ -104,7 +109,7 @@ public class TestMain {
                 }
 
                 // If there are ties to break, verify that all tied seats have value astar, and the others a smaller.
-                // First, count the number of parties who have tied with the last seat but where not considered
+                // First, count the number of parties who have tied with the last seat but were not considered
                 int sumAstarsNotTaken = 0;
                 for (int i = 0; i < result.seats.length; i++) {
                     final double nextVal = algInst.d(result.seats[i]) / inst.votes[i];
@@ -116,9 +121,9 @@ public class TestMain {
                     // There are ties to be broken
 
                     for (int i = 0; i < result.tiedSeats.length; i++) {
-                        if (result.tiedSeats[i] == 0) {
-                            // Party is not tied, so this party should not have gotten its last seat with value astar!
-                            final double lastVal = algInst.d(result.seats[i] - 1) / inst.votes[i];
+                        if (result.tiedSeats[i] == 0 && result.seats[i] > 0) {
+                            // Party is not tied, so this party should NOT have gotten its last seat with value astar!
+	                        final double lastVal = algInst.d(result.seats[i] - 1) / inst.votes[i];
 
                             if (!fuzzyLess(lastVal, result.astar)) {
                                 errors.add("tied seats are wrong (i=" + i + " not tied, but lastVal=" + lastVal + ")");
@@ -151,12 +156,15 @@ public class TestMain {
                             correct = false;
                         }
 
-                        double min = Double.MAX_VALUE;
-                        double max = Double.MIN_VALUE;
+                        double min = Double.POSITIVE_INFINITY;
+                        double max = Double.NEGATIVE_INFINITY;
                         for (int i = 0; i < inst.votes.length; i++) {
-                            double quotient = inst.votes[i] / algInst.d(result.seats[i]);
+                            double quotient = closeToEqual(algInst.d(result.seats[i]),0) ?
+	                              Double.NEGATIVE_INFINITY :
+	                              inst.votes[i] / algInst.d(result.seats[i]);
                             if (quotient > max) max = quotient;
-                            quotient = inst.votes[i] / algInst.d(result.seats[i] - 1);
+                            quotient = result.seats[i] == 0 ? Double.POSITIVE_INFINITY :
+	                              inst.votes[i] / algInst.d(result.seats[i] - 1);
                             if (quotient < min) min = quotient;
                         }
                         if (max > min) {

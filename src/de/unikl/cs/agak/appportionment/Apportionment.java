@@ -83,6 +83,8 @@ public final class Apportionment {
                 "\tseats=" + Arrays.toString(seats) + "," + System.getProperty("line.separator") +
                 "\ttiedSeats=" + Arrays.toString(tiedSeats) +"," + System.getProperty("line.separator") +
                 "\tastar=" + astar + System.getProperty("line.separator") +
+	             "\tsum(seats)=" + sum(seats) + System.getProperty("line.separator") +
+	             "\tsum(tiedSeats)=" + sum(tiedSeats) + System.getProperty("line.separator") +
                 ')';
     }
 

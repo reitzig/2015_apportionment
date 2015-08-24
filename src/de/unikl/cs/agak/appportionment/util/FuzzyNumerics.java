@@ -34,14 +34,15 @@ public class FuzzyNumerics {
      * @return <tt>floor(x*(1+epsilon))</tt>, for a small epsilon intended to cover
      * potential rounding errors in x
      */
-    public static int fuzzyFloor(double x) { // TODO enable negative parameters
-        if (x < 0) throw new IllegalArgumentException("fuzzyFloor only works for x >= 0");
-        final double xTimesOnePlusEps = Double.longBitsToDouble(
-                Double.doubleToRawLongBits(x) + MANTISSA_EPSILON);
-        return (int) Math.floor(xTimesOnePlusEps);
+    public static int fuzzyFloor(double x) { // TODO enable negative parameters?
+	    if (x < -1) throw new IllegalArgumentException("fuzzyFloor only works for x >= 0");
+	    if (x < 0) return x < -EPSILON ? -1 : 0;
+	    final double xTimesOnePlusEps = Double.longBitsToDouble(Double.doubleToRawLongBits(
+		      x) + MANTISSA_EPSILON);
+	    return (int) Math.floor(xTimesOnePlusEps);
     }
 
-    /**
+	/**
      * @param x
      * @return <tt>ceil(x*(1-epsilon))</tt>, for a small epsilon intended to cover
      * potential rounding errors in x

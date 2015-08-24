@@ -95,7 +95,9 @@ public class PukelsheimLS extends IterativeMethod implements AlgorithmWithCounte
 
             // Seed list with initial values
             for (int i = 0; i < n; i++) {
+	            if (step == +1 || seats[i] > 0) { // in s>k setting, skip parties without any seats
                 values[i] = d(seats[i] + offset) / instance.votes[i];
+	            }
             }
 
             // Subsequently assign seats
@@ -108,13 +110,19 @@ public class PukelsheimLS extends IterativeMethod implements AlgorithmWithCounte
                 }
 
                 seats[im] += step;
-                values[im] = d(seats[im] + offset) / instance.votes[im];
+	            if (step == -1 && seats[im] <= 0) {
+		            // No more seats to remove, make sure never picked again
+		            values[im] = Double.NEGATIVE_INFINITY;
+	            } else {
+		            values[im] = d(seats[im] + offset) / instance.votes[im];
+	            }
                 sumSeats += step;
             }
 
             // Compute astar; TODO can we do this smarter?
             double astar = 0.0;
             for (int i = 0; i < seats.length; i++) {
+	            if (seats[i] == 0) continue;
                 double cand = d(seats[i] - 1) / instance.votes[i];
                 if (cand > astar) astar = cand;
             }

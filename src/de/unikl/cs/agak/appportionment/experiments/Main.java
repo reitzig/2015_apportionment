@@ -33,16 +33,33 @@ import static edu.princeton.cs.introcs.StdStats.sum;
 @Deprecated
 class Main {
 	public static void main(String[] args) throws Exception {
-        System.out.println("THIS TEST IS DEPRECATED. USE TestMain INSTEAD!");
 
-		final PukelsheimPQ pq = new PukelsheimPQ(1,1.5);
-		final Apportionment apportion = pq.apportion(new ApportionmentInstance(
-			  new double[]{11.0, 33.0, 32.0, 96.0, 84.0, 97.0, 49.0, 44.0, 67.0, 57.0, 83.0,
-					 5.0, 18.0, 16.0, 31.0, 58.0, 36.0, 54.0, 26.0, 53.0}, 200));
+//		final LinearApportionmentMethod m = new PukelsheimPQ(1,1.5);
+//		final LinearApportionmentMethod m = new SelectAStar(1.353375202278564,1.9663096697020648);
+//		final LinearApportionmentMethod m = new SelectAStar(1.35,1.96);
+		final LinearApportionmentMethod m = new PukelsheimLS( 1.2196377621480445,1.2774171590615349);
+		final ApportionmentInstance instance = new ApportionmentInstance(
+			  new double[]{25.0, 68.0, 76.0, 26.0, 55.0, 19.0, 31.0, 48.0, 81.0, 10.0, 80.0}, 44);
+//		final ApportionmentInstance instance = new ApportionmentInstance(
+//			  new double[]{46.0, 1.0, 74.0, 9.0, 44.0, 23.0, 85.0, 36.0, 72.0, 12.0, 2.0,
+//					 89.0, 95.0, 41.0, 7.0, 7.0, 39.0, 37.0, 60.0, 63.0, 77.0, 18.0, 58.0,
+//					 24.0, 95.0, 92.0, 86.0, 20.0, 50.0, 71.0, 99.0, 61.0, 79.0, 32.0, 39.0,
+//					 74.0, 25.0, 69.0, 71.0, 48.0, 74.0, 61.0, 87.0}, 430);
+		System.out.println("instance = " + instance);
+		final Apportionment apportion = m.apportion(instance);
 		System.out.println("apportion = " + apportion);
 		System.out.println("sum(apportion.seats) = " + sum(apportion.seats));
+		System.out.println("sum(apportion.tiedSeats) = " + sum(apportion.tiedSeats));
+
+		final Apportionment apportion2 = new PukelsheimLS(1.35, 1.96).apportion(instance);
+		System.out.println("apportion2 = " + apportion2);
+		System.out.println("sum(apportion2.seats) = " + sum(apportion2.seats));
+		System.out.println("sum(apportion2.tiedSeats) = " + sum(apportion2.tiedSeats));
 
 		System.exit(0);
+
+		
+		System.out.println("THIS TEST IS DEPRECATED. USE TestMain INSTEAD!");
 
 		smallExample();
 
@@ -156,8 +173,8 @@ class Main {
 	private static void runAllOn(ApportionmentInstance instance, double alpha, double beta)
 		  throws Exception {
 		List<LinearApportionmentMethod> algs = Arrays.asList(
-		  new SelectAStarNaive(alpha, beta), 
-		  new SelectAStarWithOptimalityCheck(alpha, beta), 
+		  new SelectAStarNaive(alpha, beta),
+		  new SelectAStarWithOptimalityCheck(alpha, beta),
 		  new AStarChengEppstein(alpha, beta),
 			new SelectAStar(alpha, beta),
 			new IterativeDMPQ(alpha, beta),
@@ -170,7 +187,7 @@ class Main {
 		  throws Exception {
 		List<LinearApportionmentMethod> algs = Arrays.asList(
 		  new SelectAStarWithOptimalityCheck(alpha, beta),
-		  new AStarChengEppstein(alpha, beta), 
+		  new AStarChengEppstein(alpha, beta),
 		  new SelectAStar(alpha, beta),
 			new IterativeDMLS(alpha, beta),
 			new IterativeDMPQ(alpha, beta),

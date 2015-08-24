@@ -43,17 +43,28 @@ abstract public class SelectionBasedMethod extends LinearApportionmentMethod {
 
         // Now we have *all* seats with value astar, which may be too many.
         // Identify ties for the last few seats!
-        final int[] tiedSeats = new int[n];
-        for (int i = 0; i < n; i++) {
-            if (closeToEqual(d(seats[i] - 1) / instance.votes[i], astar)) {
-                tiedSeats[i] = 1;
-                seats[i] -= 1;
-            }
-            /* TODO If astar occurs only once, this creats a one-party tie.
-                    That's not wrong, but do we want that? */
-        }
+	    int theOnlyTie = -1;
+	    final int[] tiedSeats = new int[n];
+	    for (int i = 0; i < n; i++) {
+		    if (seats[i] == 0) {
+			    if (closeToEqual(d(0) / instance.votes[i], astar)) {
+				    tiedSeats[i] = 1;
+				    if (theOnlyTie == -1) theOnlyTie = i; else theOnlyTie = -42;
+				    // TODO This should actually never happen according to above comment.
+				    throw new IllegalStateException();
+			    }
+		    } else if (closeToEqual(d(seats[i] - 1) / instance.votes[i], astar)) {
+			    tiedSeats[i] = 1;
+			    seats[i] -= 1;
+			    if (theOnlyTie == -1) theOnlyTie = i; else theOnlyTie = -42;
+		    }
+	    }
+	    if (theOnlyTie >= 0) {
+		    tiedSeats[theOnlyTie] = 0;
+		    seats[theOnlyTie] += 1;
+	    }
 
-        return new Apportionment(instance.k, seats, tiedSeats, astar);
+	    return new Apportionment(instance.k, seats, tiedSeats, astar);
     }
 
     /**

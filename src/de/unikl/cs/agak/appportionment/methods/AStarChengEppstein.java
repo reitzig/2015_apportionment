@@ -318,6 +318,7 @@ public class AStarChengEppstein extends SelectionBasedMethod {
         }
 
         double jth(int j) {
+	        if (j < 0) throw new IllegalArgumentException();
             return d(j) / v_i;
         }
     }

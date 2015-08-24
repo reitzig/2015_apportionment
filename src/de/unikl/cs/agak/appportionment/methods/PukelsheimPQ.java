@@ -109,7 +109,9 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
             // Initialize heap
             final ArrayList<Entry> initials = new ArrayList<>(n);
             for (int i = 0; i < n; i++) {
-                initials.add(new Entry(i, d(seats[i] + offset) / instance.votes[i], order));
+	            if (step == +1 || seats[i] > 0) { // in s>k setting, skip parties without any seats
+                  initials.add(new Entry(i, d(seats[i] + offset) / instance.votes[i], order));
+	            }
             }
             final PriorityQueue<Entry> heap = new PriorityQueue<>(initials);
 
@@ -118,14 +120,19 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
                 final Entry e = heap.poll();
                 final int i = e.index;
                 seats[i] += step;
-                e.value = d(seats[i] + offset) / instance.votes[i];
-                heap.add(e);
-                sumSeats += step;
+
+	            // Unless party i has no more seats to remove, re-add it into PQ
+	            if (step != -1 || seats[i] != 0) {
+		            e.value = d(seats[i] + offset) / instance.votes[i];
+		            heap.add(e);
+	            }
+	            sumSeats += step;
             }
 
             // Compute astar; TODO can we do this smarter?
             double astar = 0.0;
             for (int i = 0; i < seats.length; i++) {
+	            if (seats[i] == 0) continue;
                 double cand = d(seats[i] - 1) / instance.votes[i];
                 if (cand > astar) astar = cand;
             }

@@ -17,6 +17,7 @@ package de.unikl.cs.agak.appportionment.methods;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.util.FuzzyNumerics;
 
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.EPSILON;
 
@@ -47,8 +48,13 @@ public abstract class LinearApportionmentMethod {
      */
     public final double d(int j) {
         if (j < 0) {
-            // By convention (cf. article) we return -infty for negative values.
-            return Double.MIN_VALUE; // TODO we would want to use Double.NEGATIVE_INFINITY, but that breaks the algorithms?
+	         throw new IllegalArgumentException("Got j="+j);
+           // The convention in the article was -infty for negative values,
+	        // but a single convention that can consistently be used in all cases seems
+	        // to be impossible, so check for negative values on call site.
+	        // Usually, this makes the difference between a party that has 0 seats
+	        // and one that has at least one seat, so often a case distinction is
+	        // needed anyway.
         }
 
         return alpha * j + beta;
@@ -61,13 +67,12 @@ public abstract class LinearApportionmentMethod {
      * @return <code>(x - beta) / alpha</code>
      */
     public final double deltaInvRaw(double x) {
-        // TODO don't we have to take care of negative parameters?
         return (x - beta) / alpha;
     }
 
     public final double deltaInv(double x) {
-        // TODO don't we have to take care of negative parameters?
-	    return x < beta ? -0.5 : (x - beta) / alpha;
+	    final double raw = (x - beta) / alpha;
+	    return raw < -1 ? -1 : raw;
     }
 
     /**
@@ -79,11 +84,10 @@ public abstract class LinearApportionmentMethod {
      * that is an integer from at least -1.
      */
     public final int dRound(final double x) {
-        // TODO correct? use fuzzy floor when it can deal with negative parameters?
-        return Math.max(-1, (int) Math.floor(deltaInv(x) + EPSILON));
+	    return FuzzyNumerics.fuzzyFloor(deltaInv(x));
     }
 
-    /**
+	/**
      * Finds the apportionment for the given parameters.
      * @param instance An instance of the apportionment problem, consisting of
      *                 votes and house size.
