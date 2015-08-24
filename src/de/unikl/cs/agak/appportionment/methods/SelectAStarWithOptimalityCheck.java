@@ -74,9 +74,9 @@ public class SelectAStarWithOptimalityCheck extends SelectionBasedMethod {
 			if (d(0) / v_i > a_overbar) continue;
 
 			// otherwise: add all elements between a_underbar and a_overbar
-			final double realMinJ = deltaInv(v_i * a_underbar);
+			final double realMinJ = deltaInvRaw(v_i * a_underbar);
 			final int minJ = realMinJ <= 0 ? 0 : fuzzyCeil(realMinJ);
-			final int maxJ = fuzzyFloor(deltaInv(v_i * a_overbar));
+			final int maxJ = fuzzyFloor(deltaInvRaw(v_i * a_overbar));
 			for (int j = minJ; j <= maxJ; ++j) {
 				A_hat[A_hat_size++] = d(j) / v_i;
 			}
@@ -100,7 +100,7 @@ public class SelectAStarWithOptimalityCheck extends SelectionBasedMethod {
 			// If sequence is not contributing, deltaInv might be invalid (< 0 etc),
 			// so explicitly handle that case:
 			if (d(0) / v_i > x) continue;
-			double deltaInv = deltaInv(v_i * x);
+			double deltaInv = deltaInvRaw(v_i * x);
 
 			Integer deltaInvInt = integer(deltaInv);
 			if (deltaInvInt != null) {

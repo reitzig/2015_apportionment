@@ -67,7 +67,8 @@ public class TestMain {
         for ( int i=0; i<REPS; i++ ) {
             final ApportionmentInstance inst = ApportionmentInstanceFactory.uniformRandomInstance(r, r.uniform(MIN_N, MAX_N), kFactory);
             final double alpha = r.uniform(MIN_ALPHA, MAX_ALPHA);
-            tests.add(new ApportionmentInstanceWithMethod(inst.votes, inst.k, alpha, r.uniform(0.0, 1.5 * alpha)));
+	         final double beta = r.uniform(0.0, 1.5 * alpha);
+	         tests.add(new ApportionmentInstanceWithMethod(inst.votes, inst.k, alpha, beta));
         }
 
         // Test all combinations of algorithm and instance
@@ -181,7 +182,7 @@ public class TestMain {
                     if ( "missingSeats".equals(awc.getCounterLabel()) ) {
                         /* This is a Pukelsheim implementation. It should never have more than
                          * n resp. floor(n/2) seats missing or too many. */
-                        final int divisor = algInst.isStationary() ? 2 : 1;
+                        final double divisor = algInst.isStationary() ? 2 : 1;
                         if ( Math.abs(awc.getLastCounter()) > inst.votes.length / divisor ) {
                             errors.add("Estimator is off by too much"
                                     + (algInst.isStationary() ? " for a stationary method" : "")

@@ -58,9 +58,14 @@ public abstract class LinearApportionmentMethod {
      * @param x Some number
      * @return <code>(x - beta) / alpha</code>
      */
-    public final double deltaInv(double x) {
+    public final double deltaInvRaw(double x) {
         // TODO don't we have to take care of negative parameters?
         return (x - beta) / alpha;
+    }
+
+    public final double deltaInv(double x) {
+        // TODO don't we have to take care of negative parameters?
+	    return x < beta ? -0.5 : (x - beta) / alpha;
     }
 
     /**

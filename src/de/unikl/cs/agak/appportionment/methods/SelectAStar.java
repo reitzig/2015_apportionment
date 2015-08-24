@@ -19,6 +19,7 @@ import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.experiments.AlgorithmWithCounter;
 import de.unikl.cs.agak.appportionment.util.RankSelection;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -55,7 +56,7 @@ public class SelectAStar extends SelectionBasedMethod implements AlgorithmWithCo
         double x_overbar = d(instance.k - 1) / maxPop + 5 * EPSILON;
         // x_overbar clearly feasible and suboptimal
 
-		Collection<Integer> I_x_overbar = new LinkedList<>();
+		Collection<Integer> I_x_overbar = new ArrayList<>(n);
 		double Sigma_I_x_overbar = 0;
 		for (int i = 0; i < n; ++i) {
             if (instance.votes[i] > d(0) / x_overbar) {
@@ -74,21 +75,21 @@ public class SelectAStar extends SelectionBasedMethod implements AlgorithmWithCo
 
 		// step 6
 		final double[] A_hat = new double[A_hat_bound];
-        // TODO how is this better than just using an ArrayLlist?
+        // TODO how is this better than just using an ArrayList?
 
 		int A_hat_size = 0;
         int k_hat = instance.k;
 
 		for (int i : I_x_overbar) {
             double v_i = instance.votes[i];
-            // If sequence is not contributing, deltaInv might be invalid (< 0 etc),
+            // If sequence is not contributing, deltaInvRaw might be invalid (< 0 etc),
 			// so explicitly handle that case:
 			if (d(0) / v_i > a_overbar) continue;
 
 			// otherwise: add all elements between a_underbar and a_overbar
-			final double realMinJ = deltaInv(v_i * a_underbar);
+			final double realMinJ = deltaInvRaw(v_i * a_underbar);
 			final int minJ = realMinJ <= 0 ? 0 : fuzzyCeil(realMinJ);
-			final int maxJ = fuzzyFloor(deltaInv(v_i * a_overbar));
+			final int maxJ = fuzzyFloor(deltaInvRaw(v_i * a_overbar));
 			for (int j = minJ; j <= maxJ; ++j) {
 				A_hat[A_hat_size++] = d(j) / v_i;
 			}

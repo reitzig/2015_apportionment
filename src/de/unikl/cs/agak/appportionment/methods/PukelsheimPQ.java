@@ -20,6 +20,7 @@ import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.experiments.AlgorithmWithCounter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
@@ -60,15 +61,18 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
         final double D;
         if ( isStationary() ) {
             // Use recommended estimator (cf Pukelsheim, section 6.1) resp. its reciprocal
-            D = (instance.k + n * (beta / alpha - 0.5)) / sumPop;
-        } else {
+            D = alpha * (instance.k + n * (beta / alpha - 0.5)) / sumPop;
+        } else if (beta / alpha <= 1.0) {
             // Fallback to the universal estimator
-            D = instance.k / sumPop;
+            D = alpha * instance.k / sumPop;
+        } else {
+	        // Generalized estimator for sequences that are not real signposts
+	        D = alpha * (instance.k + n * Math.floor(beta / alpha)) / sumPop;
         }
 
         for (int i = 0; i < n; i++) {
             seats[i] = (int) Math.floor(deltaInv(instance.votes[i] * D) + EPSILON) + 1;
-            // TODO correct? use fuzzy floor when it can deal with negative parameters?
+            // TODO use fuzzy floor when it can deal with negative parameters
         }
 
         int sumSeats = sum(seats);

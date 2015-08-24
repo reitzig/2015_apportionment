@@ -28,10 +28,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static edu.princeton.cs.introcs.StdStats.sum;
+
 @Deprecated
 class Main {
 	public static void main(String[] args) throws Exception {
         System.out.println("THIS TEST IS DEPRECATED. USE TestMain INSTEAD!");
+
+		final PukelsheimPQ pq = new PukelsheimPQ(1,1.5);
+		final Apportionment apportion = pq.apportion(new ApportionmentInstance(
+			  new double[]{11.0, 33.0, 32.0, 96.0, 84.0, 97.0, 49.0, 44.0, 67.0, 57.0, 83.0,
+					 5.0, 18.0, 16.0, 31.0, 58.0, 36.0, 54.0, 26.0, 53.0}, 200));
+		System.out.println("apportion = " + apportion);
+		System.out.println("sum(apportion.seats) = " + sum(apportion.seats));
+
+		System.exit(0);
 
 		smallExample();
 

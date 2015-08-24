@@ -53,17 +53,20 @@ public class PukelsheimLS extends IterativeMethod implements AlgorithmWithCounte
         double sumPop = sum(instance.votes);
 
         final double D;
-        if ( isStationary() ) {
-            // Use recommended estimator (cf Pukelsheim, section 6.1) resp. its reciprocal
-            D = (instance.k + n * (beta / alpha - 0.5)) / sumPop;
-        } else {
-            // Fallback to the universal estimator
-            D = instance.k / sumPop;
-        }
+	    if ( isStationary() ) {
+	        // Use recommended estimator (cf Pukelsheim, section 6.1) resp. its reciprocal
+	        D = alpha * (instance.k + n * (beta / alpha - 0.5)) / sumPop;
+	    } else if (beta / alpha <= 1.0) {
+	        // Fallback to the universal estimator
+	        D = alpha * instance.k / sumPop;
+	    } else {
+		    // Generalized estimator for sequences that are not real signposts
+		    D = alpha * (instance.k + n * Math.floor(beta / alpha)) / sumPop;
+	    }
 
         for (int i = 0; i < n; i++) {
-            seats[i] = (int) Math.floor(deltaInv(instance.votes[i] * D) + EPSILON) + 1;
-            // TODO correct? use fuzzy floor when it can deal with negative parameters?
+            seats[i] = ((int) Math.floor(deltaInv(instance.votes[i] * D) + EPSILON)) + 1;
+            // TODO use fuzzy floor when it can deal with negative parameters
         }
 
         int sumSeats = sum(seats);
