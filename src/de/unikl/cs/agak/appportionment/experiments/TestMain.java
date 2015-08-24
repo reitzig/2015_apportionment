@@ -67,7 +67,8 @@ public class TestMain {
         for ( int i=0; i<REPS; i++ ) {
             final ApportionmentInstance inst = ApportionmentInstanceFactory.uniformRandomInstance(r, r.uniform(MIN_N, MAX_N), kFactory);
             final double alpha = r.uniform(MIN_ALPHA, MAX_ALPHA);
-            tests.add(new ApportionmentInstanceWithMethod(inst.votes, inst.k, alpha, r.uniform(0.0, 1.5 * alpha)));
+            final double beta = r.uniform(0.0, 1.5 * alpha);
+            tests.add(new ApportionmentInstanceWithMethod(inst.votes, inst.k, alpha, beta));
         }
 
         // Test all combinations of algorithm and instance
@@ -102,39 +103,36 @@ public class TestMain {
                     correct = false;
                 }
 
-                // Verify that all tied seats have value astar, and the others a smaller
-                int lastAstar = -1;
-                double lastAstarVal = -1.0;
-                for (int i = 0; i < result.tiedSeats.length; i++) {
-                    if ( result.tiedSeats[i] == 0 ) {
-                        // Party is not tied, so either there are no ties
-                        // or this party should not gotten its last seat with
-                        // value astar!
-                        final double lastVal = algInst.d(result.seats[i] - 1) / inst.votes[i];
+                // If there are ties to break, verify that all tied seats have value astar, and the others a smaller.
+                // First, count the number of parties who have tied with the last seat but where not considered
+                int sumAstarsNotTaken = 0;
+                for (int i = 0; i < result.seats.length; i++) {
+                    final double nextVal = algInst.d(result.seats[i]) / inst.votes[i];
+                    if (closeToEqual(nextVal, result.astar)) {
+                        sumAstarsNotTaken++;
+                    }
+                }
+                if (sumAstarsNotTaken > 0) {
+                    // There are ties to be broken
 
-                        if ( !fuzzyLess(lastVal, result.astar) ) {
-                            if (lastAstar == -1) {
-                                // This is the first violation; it's only an error if there are two!
-                                lastAstar = i;
-                                lastAstarVal = lastVal;
-                            } else {
-                                if (lastAstar != -2) {
-                                    // Print first violation
-                                    errors.add("tied seats are wrong (" + lastAstar + "; " + lastAstarVal + ")");
-                                    lastAstar = -2;
-                                }
-                                errors.add("tied seats are wrong (" + i + "; " + lastVal + ")");
+                    for (int i = 0; i < result.tiedSeats.length; i++) {
+                        if (result.tiedSeats[i] == 0) {
+                            // Party is not tied, so this party should not have gotten its last seat with value astar!
+                            final double lastVal = algInst.d(result.seats[i] - 1) / inst.votes[i];
+
+                            if (!fuzzyLess(lastVal, result.astar)) {
+                                errors.add("tied seats are wrong (i=" + i + " not tied, but lastVal=" + lastVal + ")");
                                 correct = false;
                             }
                         }
-                    }
-                    if ( result.tiedSeats[i] == 1 ) {
-                        // Party is tied for its last seat, so its next value should be astar!
-                        final double nextVal = algInst.d(result.seats[i]) / inst.votes[i];
+                        if (result.tiedSeats[i] == 1) {
+                            // Party is tied for its last seat, so its next value should be astar!
+                            final double nextVal = algInst.d(result.seats[i]) / inst.votes[i];
 
-                        if ( !closeToEqual(nextVal, result.astar) ) {
-                            errors.add("tied seats are wrong (" + i + "; " + nextVal + ")");
-                            correct = false;
+                            if (!closeToEqual(nextVal, result.astar)) {
+                                errors.add("tied seats are wrong (i=" + i + " tied, but nextVal=" + nextVal + ")");
+                                correct = false;
+                            }
                         }
                     }
                 }
