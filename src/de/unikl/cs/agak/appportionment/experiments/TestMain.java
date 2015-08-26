@@ -82,8 +82,10 @@ public class TestMain {
         LinearApportionmentMethod algInst = alg.getConstructor(double.class, double.class).newInstance(inst.alpha, inst.beta);
         Apportionment result = algInst.apportion(inst);
 
+        final int n = inst.votes.length;
+
         // Tests against dumb mistakes
-        if ( result.seats.length != inst.votes.length || result.tiedSeats.length != inst.votes.length ) {
+        if ( result.seats.length != n || result.tiedSeats.length != n ) {
           errors.add("wrong number of parties served (" + result.seats.length + ";" + result.tiedSeats.length + ")");
           correct = false;
         }
@@ -154,7 +156,7 @@ public class TestMain {
 
             double min = Double.POSITIVE_INFINITY;
             double max = Double.NEGATIVE_INFINITY;
-            for ( int i = 0; i < inst.votes.length; i++ ) {
+            for ( int i = 0; i < n; i++ ) {
               double quotient = fuzzyEquals(algInst.d(result.seats[i]), 0) ?
                   Double.NEGATIVE_INFINITY :
                   inst.votes[i] / algInst.d(result.seats[i]);
@@ -185,7 +187,7 @@ public class TestMain {
                          * n resp. floor(n/2) seats missing or too many. */
             // TODO realistic? We do fuzzy stuff, after all
             final double divisor = algInst.isStationary() ? 2 : 1;
-            if ( Math.abs(awc.getLastCounter()) > inst.votes.length / divisor ) {
+            if ( Math.abs(awc.getLastCounter()) > n / divisor ) {
               errors.add("Estimator is off by too much"
                   + (algInst.isStationary() ? " for a stationary method" : "")
                   + "; missed house size by " + awc.getLastCounter() + ".");
@@ -197,7 +199,7 @@ public class TestMain {
             // TODO can we guess/recompute |I_x| externally?
             if ( algInst.isStationary() ) {
               // Stationary method; upper bound 2n, plus allowance for fuzzy arithmetics
-              if ( awc.getLastCounter() > 3 * inst.votes.length ) {
+              if ( awc.getLastCounter() > 3 * n ) {
                 errors.add("Candidate set too large for stationary method: "
                     + awc.getLastCounter());
                 correct = false;
@@ -205,7 +207,7 @@ public class TestMain {
             }
             else {
               // General bound of 2 * (1 + beta/alpha) * n, plus allowance for fuzzy arithmetics
-              if ( awc.getLastCounter() > (2 * (1 + inst.beta / inst.alpha) + 1) * inst.votes.length ) {
+              if ( awc.getLastCounter() > (2 * (1 + inst.beta / inst.alpha) + 1) * n ) {
                 errors.add("Candidate set too large: "
                     + awc.getLastCounter());
                 correct = false;

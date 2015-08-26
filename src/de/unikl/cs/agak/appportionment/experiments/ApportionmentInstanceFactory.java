@@ -18,8 +18,6 @@ package de.unikl.cs.agak.appportionment.experiments;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.util.SedgewickRandom;
 
-import java.util.Arrays;
-
 /**
  * Samples apportionment instances randomly.
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
@@ -32,7 +30,7 @@ public class ApportionmentInstanceFactory {
     static ApportionmentInstance uniformRandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
         final double[] votes = new double[n];
         for (int i = 0; i < votes.length; i++) {
-            votes[i] = random.uniform(1, 100);
+            votes[i] = random.uniform(0.0, 2.0);
         }
         return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
     }
@@ -44,7 +42,7 @@ public class ApportionmentInstanceFactory {
     static ApportionmentInstance exponentialRandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
         final double[] votes = new double[n];
         for (int i = 0; i < votes.length; i++) {
-            votes[i] = 1 + random.exp(10);
+            votes[i] = 1.0 + random.exp(1.0);
         }
         return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
     }

@@ -15,14 +15,15 @@
 
 # Requires: Ruby 1.9.3, Ant, Java 7, gnuplot, GNU utilities
 
+require 'fileutils'
+
 if ( ARGV.size < 1 )
   puts "Usage: ruby run_experiments.rb FILES...";
   Process.exit
 end
 
 puts "Compiling..."
-`ant clean`
-`ant compile`
+`ant clean compile`
 
 experiments = []
 
@@ -103,12 +104,20 @@ ARGV.each { |f|
 dir = "experiments_#{Time.now.strftime("%Y-%m-%d-%H:%M:%S")}"
 Dir.mkdir(dir)
 Dir.chdir(dir)
+
+# Setup folder structure the Java program expects
+FileUtils::mkdir_p(["tmp", "data", "plots/times", "plots/counters", 
+                    "plots/scatter", "plots/averages"])
+
+# Run and protocol everything
 puts "Performing #{experiments.size} experiments..."
 puts "\t(Follow progress with 'tail -f #{dir}/experiments.log')"
 experiments.each { |e|
+  `echo "#{e.join("\t")}" >> all.experiment`
   `java -cp ../build de.unikl.cs.agak.appportionment.experiments.RunningTimeMain #{e.join(" ")} >> experiments.log`
   `echo "\n\n\n" >> experiments.log`
 }
+`echo "Done." >> experiments.log`
 
 # Prettify log
 lines = []
@@ -121,6 +130,6 @@ File.open("experiments.log", "w") { |f|
 }
 
 puts "Plotting..."
-Dir["*.gp"].each { |gp|
+Dir["tmp/*.gp"].each { |gp|
   `gnuplot "#{gp}"`
 }
