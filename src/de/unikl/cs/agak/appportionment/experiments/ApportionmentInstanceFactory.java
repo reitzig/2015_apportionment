@@ -20,91 +20,100 @@ import de.unikl.cs.agak.appportionment.util.SedgewickRandom;
 
 /**
  * Samples apportionment instances randomly.
+ *
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
 public class ApportionmentInstanceFactory {
-    static ApportionmentInstance uniformRandomInstance(final int n, final KFactory k) {
-        return uniformRandomInstance(SedgewickRandom.instance, n, k);
+  static final VoteFactory UniformVotes = new VoteFactory() {
+    @Override
+    public double next(SedgewickRandom r) {
+      return r.uniform(1.0, 3.0);
+    }
+  };
+
+  static final VoteFactory ExponentialVotes = new VoteFactory() {
+    @Override
+    public double next(SedgewickRandom r) {
+      return 1.0 + r.exp(1.0);
+    }
+  };
+
+  static final VoteFactory PoissonVotes = new VoteFactory() {
+    @Override
+    public double next(SedgewickRandom r) {
+      return 1.0 + r.poisson(100)/100.0;
+    }
+  };
+
+  static final VoteFactory Pareto1_5Votes = new VoteFactory() {
+    @Override
+    public double next(SedgewickRandom r) {
+      return 1.0 + r.pareto(1.5);
+    }
+  };
+
+  @Deprecated
+  static final VoteFactory Pareto2Votes = new VoteFactory() {
+    @Override
+    public double next(SedgewickRandom r) {
+      return 1.0 + r.pareto(2.0);
+    }
+  };
+
+  @Deprecated
+  static final VoteFactory Pareto3Votes = new VoteFactory() {
+    @Override
+    public double next(SedgewickRandom r) {
+      return 1.0 + r.pareto(3.0);
+    }
+  };
+
+  static ApportionmentInstance randomInstance(final SedgewickRandom random, final VoteFactory vf, final int n, final KFactory k) {
+    final double[] votes = new double[n];
+    for ( int i = 0; i < votes.length; i++ ) {
+      votes[i] = vf.next(random);
+    }
+    return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
+  }
+
+  public interface VoteFactory {
+    double next(SedgewickRandom r);
+  }
+
+  public static class KFactory {
+    int minK;
+    int maxK;
+
+    /**
+     * Creates a factory that always samples k*n.
+     */
+    public KFactory(int k) {
+      minK = k;
+      maxK = k;
     }
 
-    static ApportionmentInstance uniformRandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
-        final double[] votes = new double[n];
-        for (int i = 0; i < votes.length; i++) {
-            votes[i] = random.uniform(0.0, 2.0);
-        }
-        return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
+    /**
+     * Creates a factory that samples uniformly from interval [min*n,max*n].
+     */
+    public KFactory(int min, int max) {
+      assert min <= max;
+      minK = min;
+      maxK = max;
     }
 
-    static ApportionmentInstance exponentialRandomInstance(final int n, final KFactory k) {
-        return exponentialRandomInstance(SedgewickRandom.instance, n, k);
+    public int sampleFactor(SedgewickRandom r) {
+      if ( minK == maxK )
+        return minK;
+      else
+        return r.uniform(minK, maxK);
     }
 
-    static ApportionmentInstance exponentialRandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
-        final double[] votes = new double[n];
-        for (int i = 0; i < votes.length; i++) {
-            votes[i] = 1.0 + random.exp(1.0);
-        }
-        return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
+    @Override
+    public String toString() {
+      if ( minK == maxK )
+        return Integer.toString(minK) + "*n";
+      else
+        return "U[" + minK + "*n, " + maxK + "*n]";
     }
-
-    static ApportionmentInstance pareto1_5RandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
-        final double[] votes = new double[n];
-        for (int i = 0; i < votes.length; i++) {
-            votes[i] = 1 + random.pareto(1.5); // TODO make alpha-parameter configurable?
-        }
-        return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
-    }
-    static ApportionmentInstance pareto2RandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
-        final double[] votes = new double[n];
-        for (int i = 0; i < votes.length; i++) {
-            votes[i] = 1 + random.pareto(2); // TODO make alpha-parameter configurable?
-        }
-        return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
-    }
-    static ApportionmentInstance pareto3RandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
-        final double[] votes = new double[n];
-        for (int i = 0; i < votes.length; i++) {
-            votes[i] = 1 + random.pareto(3); // TODO make alpha-parameter configurable?
-        }
-        return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
-    }
-
-
-
-    public static class KFactory {
-        int minK;
-        int maxK;
-
-        /**
-         * Creates a factory that always samples k*n.
-         */
-        public KFactory(int k) {
-            minK = k;
-            maxK = k;
-        }
-
-        /**
-         * Creates a factory that samples uniformly from interval [min*n,max*n].
-         */
-        public KFactory(int min, int max) {
-            assert min <= max;
-            minK = min;
-            maxK = max;
-        }
-
-        public int sampleFactor(SedgewickRandom r) {
-            if (minK == maxK)
-                return minK;
-            else
-                return r.uniform(minK, maxK);
-        }
-
-        @Override
-        public String toString() {
-            if (minK == maxK)
-                return Integer.toString(minK) + "*n";
-            else
-                return "U[" + minK + "*n, " + maxK + "*n]";
-        }
-    }
+  }
 }

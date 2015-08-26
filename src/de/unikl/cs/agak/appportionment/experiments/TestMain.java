@@ -27,6 +27,7 @@ import java.util.List;
 
 import static de.unikl.cs.agak.appportionment.util.AssortedUtils.isBinary;
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
+import static de.unikl.cs.agak.appportionment.experiments.ApportionmentInstanceFactory.*;
 import static edu.princeton.cs.introcs.StdStats.sum;
 
 /**
@@ -66,7 +67,7 @@ public class TestMain {
     final ApportionmentInstanceFactory.KFactory kFactory = new ApportionmentInstanceFactory.KFactory(FACT_K);
     final List<ApportionmentInstanceWithMethod> tests = new LinkedList<>();
     for ( int i = 0; i < REPS; i++ ) {
-      final ApportionmentInstance inst = ApportionmentInstanceFactory.uniformRandomInstance(r, r.uniform(MIN_N, MAX_N), kFactory);
+      final ApportionmentInstance inst = ApportionmentInstanceFactory.randomInstance(r, UniformVotes, r.uniform(MIN_N, MAX_N), kFactory);
       final double alpha = r.uniform(MIN_ALPHA, MAX_ALPHA);
       final double beta = r.uniform(0.0, 1.5 * alpha);
       tests.add(new ApportionmentInstanceWithMethod(inst.votes, inst.k, alpha, beta));

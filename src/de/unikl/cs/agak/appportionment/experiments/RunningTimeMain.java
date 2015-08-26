@@ -27,6 +27,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.*;
 
+import static de.unikl.cs.agak.appportionment.experiments.ApportionmentInstanceFactory.*;
+
 /**
  * Executes running time experiments for all divisor method implementations in
  * {@link de.unikl.cs.agak.appportionment.methods}.
@@ -217,26 +219,30 @@ public class RunningTimeMain {
 
           for ( int inputNr = 1; inputNr <= inputsPerN; ++inputNr ) {
             System.out.println("\t\tinputNr=" + inputNr + now());
-            final ApportionmentInstance input;
+            final VoteFactory vf;
             switch ( inputType ) {
               case "uniform":
-                input = ApportionmentInstanceFactory.uniformRandomInstance(random, n, k);
+                vf = UniformVotes;
                 break;
               case "exponential":
-                input = ApportionmentInstanceFactory.exponentialRandomInstance(random, n, k);
+                vf = ExponentialVotes;
+                break;
+              case "poisson":
+                vf = PoissonVotes;
                 break;
               case "pareto1.5":
-                input = ApportionmentInstanceFactory.pareto1_5RandomInstance(random, n, k);
+                vf = Pareto1_5Votes;
                 break;
               case "pareto2":
-                input = ApportionmentInstanceFactory.pareto2RandomInstance(random, n, k);
+                vf = Pareto2Votes;
                 break;
               case "pareto3":
-                input = ApportionmentInstanceFactory.pareto3RandomInstance(random, n, k);
+                vf = Pareto3Votes;
                 break;
               default:
                 throw new IllegalArgumentException("Unknown input type " + inputType);
             }
+            final ApportionmentInstance input = ApportionmentInstanceFactory.randomInstance(random, vf, n, k);
             Apportionment app = null;
 
             final long startTime = System.nanoTime();
@@ -392,7 +398,7 @@ public class RunningTimeMain {
 
     for ( int i = 0; i < 12000; ++i ) {
       final ApportionmentInstance instance =
-          ApportionmentInstanceFactory.uniformRandomInstance(30, new ApportionmentInstanceFactory.KFactory(5));
+          ApportionmentInstanceFactory.randomInstance(SedgewickRandom.instance, UniformVotes, 30, new ApportionmentInstanceFactory.KFactory(5));
       for ( final String algoName : algoNames ) {
         algoInstance(algoName, alpha, beta).apportion(instance);
       }
