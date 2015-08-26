@@ -21,7 +21,7 @@ import de.unikl.cs.agak.appportionment.util.RankSelection;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.closeToEqual;
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyEquals;
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyFloor;
 
 /**
@@ -162,7 +162,7 @@ public class AStarChengEppstein extends SelectionBasedMethod {
             int countEqual = 0;
             boolean pickedEqual = false;
             for (Sequence a : A) {
-                if (closeToEqual(a.G(l), u)) {
+                if ( fuzzyEquals(a.G(l), u)) {
                     countEqual += 1; // NOT CLEAR; use A or Ã?
                     if (!pickedEqual) {
                         Anew.add(a);
@@ -196,7 +196,7 @@ public class AStarChengEppstein extends SelectionBasedMethod {
                 if (check == null) {
                     check = g;
                 } else {
-                    if (!closeToEqual(g, check)) {
+                    if (!fuzzyEquals(g, check)) {
                         singleValue = false;
                         break;
                     }
@@ -207,7 +207,7 @@ public class AStarChengEppstein extends SelectionBasedMethod {
             }
 
             assert !singleValue || t != null;
-        } while (!(singleValue && (r(t, A) >= k || (closeToEqual(t, u) && r(t, A) >= k - m))));
+        } while (!(singleValue && (r(t, A) >= k || (fuzzyEquals(t, u) && r(t, A) >= k - m))));
         return t;
     }
 

@@ -18,58 +18,61 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.closeToEqual;
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyEquals;
 
 /**
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
 abstract public class SelectionBasedMethod extends LinearApportionmentMethod {
-    SelectionBasedMethod(double alpha, double beta) {
-        super(alpha, beta);
+  SelectionBasedMethod(double alpha, double beta) {
+    super(alpha, beta);
+  }
+
+  @Override
+  final public Apportionment apportion(final ApportionmentInstance instance) {
+    final int n = instance.votes.length;
+
+    // Compute $a^*$
+    final double astar = unitSize(instance);
+
+    // Derive seats
+    final int[] seats = new int[n];
+    for ( int i = 0; i < n; i++ ) {
+      seats[i] = dRound(instance.votes[i] * astar) + 1;
     }
 
-    @Override
-    final public Apportionment apportion(final ApportionmentInstance instance) {
-        final int n = instance.votes.length;
-
-        // Compute $a^*$
-        final double astar = unitSize(instance);
-
-        // Derive seats
-        final int[] seats = new int[n];
-        for (int i = 0; i < n; i++) {
-            seats[i] = dRound(instance.votes[i] * astar) + 1;
+    // Now we have *all* seats with value astar, which may be too many.
+    // Identify ties for the last few seats!
+    int theOnlyTie = -1;
+    final int[] tiedSeats = new int[n];
+    for ( int i = 0; i < n; i++ ) {
+      if ( seats[i] == 0 ) {
+        if ( fuzzyEquals(d(0) / instance.votes[i], astar) ) {
+          tiedSeats[i] = 1;
+          if ( theOnlyTie == -1 ) theOnlyTie = i;
+          else theOnlyTie = -42;
+          // TODO This should actually never happen according to above comment.
+          throw new IllegalStateException();
         }
-
-        // Now we have *all* seats with value astar, which may be too many.
-        // Identify ties for the last few seats!
-	    int theOnlyTie = -1;
-	    final int[] tiedSeats = new int[n];
-	    for (int i = 0; i < n; i++) {
-		    if (seats[i] == 0) {
-			    if (closeToEqual(d(0) / instance.votes[i], astar)) {
-				    tiedSeats[i] = 1;
-				    if (theOnlyTie == -1) theOnlyTie = i; else theOnlyTie = -42;
-				    // TODO This should actually never happen according to above comment.
-				    throw new IllegalStateException();
-			    }
-		    } else if (closeToEqual(d(seats[i] - 1) / instance.votes[i], astar)) {
-			    tiedSeats[i] = 1;
-			    seats[i] -= 1;
-			    if (theOnlyTie == -1) theOnlyTie = i; else theOnlyTie = -42;
-		    }
-	    }
-	    if (theOnlyTie >= 0) {
-		    tiedSeats[theOnlyTie] = 0;
-		    seats[theOnlyTie] += 1;
-	    }
-
-	    return new Apportionment(instance.k, seats, tiedSeats, astar);
+      }
+      else if ( fuzzyEquals(d(seats[i] - 1) / instance.votes[i], astar) ) {
+        tiedSeats[i] = 1;
+        seats[i] -= 1;
+        if ( theOnlyTie == -1 ) theOnlyTie = i;
+        else theOnlyTie = -42;
+      }
+    }
+    if ( theOnlyTie >= 0 ) {
+      tiedSeats[theOnlyTie] = 0;
+      seats[theOnlyTie] += 1;
     }
 
-    /**
-     * @param instance An instance of the apportionment problem.
-     * @return The (reciprocal of the) proportionality constant (a*).
-     */
-    abstract double unitSize(ApportionmentInstance instance);
+    return new Apportionment(instance.k, seats, tiedSeats, astar);
+  }
+
+  /**
+   * @param instance An instance of the apportionment problem.
+   * @return The (reciprocal of the) proportionality constant (a*).
+   */
+  abstract double unitSize(ApportionmentInstance instance);
 }
