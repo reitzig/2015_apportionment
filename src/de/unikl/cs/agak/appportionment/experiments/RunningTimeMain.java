@@ -57,7 +57,7 @@ public class RunningTimeMain {
             IllegalAccessException, IOException {
         if (args.length < 1) {
             System.out.println(
-                    "Usage: RunningTimeMain algo1,algo2,... [n1,n2,...] [repetitions-per-timing] [inputs-per-n] [seed] [uniform|exponential] [alpha] [beta]");
+                    "Usage: RunningTimeMain algo1,algo2,... [n1,n2,...] [c|cmin,cmax] [repetitions-per-timing] [inputs-per-n] [seed] [uniform|exponential|pareto3] [alpha] [beta]");
             System.exit(42);
         }
 
@@ -165,14 +165,25 @@ public class RunningTimeMain {
                     for (int inputNr = 1; inputNr <= inputsPerN; ++inputNr) {
                         System.out.println("\t\tinputNr=" + inputNr + now());
                         final ApportionmentInstance input;
-                        if ("uniform".equals(inputType)) {
-                            input = ApportionmentInstanceFactory.uniformRandomInstance(random, n, k);
-                        } else if ("exponential".equals(inputType)) {
-                            input = ApportionmentInstanceFactory.exponentialRandomInstance(random, n, k);
-                        } else {
-                            throw new IllegalArgumentException(
-                                    "Unknown input type " + inputType);
-                        }
+	                    switch (inputType) {
+		                    case "uniform":
+			                    input = ApportionmentInstanceFactory.uniformRandomInstance(random, n, k);
+			                    break;
+		                    case "exponential":
+			                    input = ApportionmentInstanceFactory.exponentialRandomInstance(random, n, k);
+			                    break;
+		                    case "pareto1.5":
+			                    input = ApportionmentInstanceFactory.pareto1_5RandomInstance(random, n, k);
+			                    break;
+		                    case "pareto2":
+			                    input = ApportionmentInstanceFactory.pareto2RandomInstance(random, n, k);
+			                    break;
+		                    case "pareto3":
+									  input = ApportionmentInstanceFactory.pareto3RandomInstance(random, n, k);
+									  break;
+		                    default:
+			                    throw new IllegalArgumentException("Unknown input type " + inputType);
+	                    }
                         Apportionment app = null;
 
                         final long startTime = System.nanoTime();

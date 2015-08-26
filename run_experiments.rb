@@ -27,7 +27,7 @@ puts "Compiling..."
 experiments = []
 
 ERRORPREFIX = '"Illegal line #{linec} in file #{f}: "'
-DISTRIBUTIONS = ["uniform", "exponential"]
+DISTRIBUTIONS = ["uniform", "exponential", "pareto1.5", "pareto2", "pareto3"]
 
 puts "Reading experiment definitions..."
 ARGV.each { |f|

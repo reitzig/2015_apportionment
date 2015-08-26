@@ -49,6 +49,28 @@ public class ApportionmentInstanceFactory {
         return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
     }
 
+    static ApportionmentInstance pareto1_5RandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
+        final double[] votes = new double[n];
+        for (int i = 0; i < votes.length; i++) {
+            votes[i] = 1 + random.pareto(1.5); // TODO make alpha-parameter configurable?
+        }
+        return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
+    }
+    static ApportionmentInstance pareto2RandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
+        final double[] votes = new double[n];
+        for (int i = 0; i < votes.length; i++) {
+            votes[i] = 1 + random.pareto(2); // TODO make alpha-parameter configurable?
+        }
+        return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
+    }
+    static ApportionmentInstance pareto3RandomInstance(final SedgewickRandom random, final int n, final KFactory k) {
+        final double[] votes = new double[n];
+        for (int i = 0; i < votes.length; i++) {
+            votes[i] = 1 + random.pareto(3); // TODO make alpha-parameter configurable?
+        }
+        return new ApportionmentInstance(votes, k.sampleFactor(random) * n);
+    }
+
 
 
     public static class KFactory {
