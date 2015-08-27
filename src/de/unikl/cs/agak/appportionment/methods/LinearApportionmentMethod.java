@@ -19,8 +19,6 @@ import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.util.FuzzyNumerics;
 
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.EPSILON;
-
 /**
  * A divisor method whose divisor sequence is linear, i.e.
  * conforms to <code>a*j + b</code> for some constants
@@ -37,6 +35,7 @@ public abstract class LinearApportionmentMethod {
      * @param beta The offset.
      */
     public LinearApportionmentMethod(double alpha, double beta) {
+      assert alpha >= 0 && beta >= 0 : "Illegal method parameters alpha=" + alpha + ", beta=" + beta;
         this.alpha = alpha;
         this.beta = beta;
     }
@@ -70,9 +69,14 @@ public abstract class LinearApportionmentMethod {
         return (x - beta) / alpha;
     }
 
+  /**
+   * Similar to {@link #deltaInvRaw(double)}, but truncates the image to [-1, infty].
+   *
+   * @param x Some number
+   * @return <code>max(-1, deltaInvRaw(x)</code>
+   */
     public final double deltaInv(double x) {
-	    final double raw = (x - beta) / alpha;
-	    return raw < -1 ? -1 : raw;
+      return Math.max(-1, deltaInvRaw(x));
     }
 
     /**

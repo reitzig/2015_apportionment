@@ -18,7 +18,7 @@ package de.unikl.cs.agak.appportionment.methods;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
-import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.closeToEqual;
+import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyEquals;
 
 /**
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
@@ -45,13 +45,13 @@ abstract public class IterativeMethod extends LinearApportionmentMethod {
         // TODO can we do this faster?
 	    int theOnlyTie = -1;
         for (int i = 0; i < seats.length; i++) {
-            if ( seats[i] > 0 && closeToEqual(astar, d(seats[i] - 1) / instance.votes[i]) ) {
+            if ( seats[i] > 0 && fuzzyEquals(astar, d(seats[i] - 1) / instance.votes[i]) ) {
                 // Party i got a seat with value astar
                 seats[i] -= 1;
                 tiedSeats[i] = 1;
 	            if (theOnlyTie == -1) theOnlyTie = i; else theOnlyTie = -42;
             }
-            else if ( closeToEqual(astar, d(seats[i]) / instance.votes[i]) ) {
+            else if ( fuzzyEquals(astar, d(seats[i]) / instance.votes[i]) ) {
                 // Party i did *not* get a seat, but also has value astar
                 // Note how we don't have to check the current value since the
                 // sequences are increasing.

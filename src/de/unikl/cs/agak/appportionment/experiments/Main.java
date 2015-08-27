@@ -18,6 +18,7 @@ package de.unikl.cs.agak.appportionment.experiments;
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.methods.*;
+import de.unikl.cs.agak.appportionment.util.SedgewickRandom;
 import edu.princeton.cs.introcs.Stopwatch;
 
 import java.lang.management.ManagementFactory;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static de.unikl.cs.agak.appportionment.experiments.ApportionmentInstanceFactory.*;
 import static edu.princeton.cs.introcs.StdStats.sum;
 
 @Deprecated
@@ -78,7 +80,7 @@ class Main {
 
 
 		for (int i = 0; i < 5; ++i)
-			runAllOn(ApportionmentInstanceFactory.exponentialRandomInstance(30, new ApportionmentInstanceFactory.KFactory(5)), 1, 0);
+			runAllOn(ApportionmentInstanceFactory.randomInstance(SedgewickRandom.instance, ExponentialVotes, 30, new ApportionmentInstanceFactory.KFactory(5)), 1, 0);
 
 //		runAlgsOn(Instance.uniformRandomInstance(1000000),
 //			  Arrays.<LinearApportionmentMethod>asList(new SelectAStarNoOptimalityCheck(2, 1)));
@@ -124,7 +126,7 @@ class Main {
 	private static void warmup() {// warm up JIT
 		for (int i = 0; i < 12000; ++i) {
 			final ApportionmentInstance
-				  instance = ApportionmentInstanceFactory.uniformRandomInstance(30, new ApportionmentInstanceFactory.KFactory(5,10));
+				  instance = ApportionmentInstanceFactory.randomInstance(SedgewickRandom.instance, UniformVotes, 30, new ApportionmentInstanceFactory.KFactory(5,10));
             new SelectAStarNaive(2, 1).apportion(instance);
             new SelectAStarWithOptimalityCheck(2, 1).apportion(instance);
             new SelectAStar(2, 1).apportion(instance);
