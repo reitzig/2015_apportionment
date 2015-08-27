@@ -17,7 +17,7 @@ package de.unikl.cs.agak.appportionment.methods;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
-import de.unikl.cs.agak.appportionment.experiments.AlgorithmWithCounter;
+import de.unikl.cs.agak.appportionment.experiments.AlgorithmWithCounters;
 
 import static edu.princeton.cs.introcs.StdStats.sum;
 
@@ -32,8 +32,8 @@ import static edu.princeton.cs.introcs.StdStats.sum;
  *
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-public class PukelsheimLS extends IterativeMethod implements AlgorithmWithCounter {
-  /* Interface AlgorithmWithCounter and this member variable are only
+public class PukelsheimLS extends IterativeMethod implements AlgorithmWithCounters {
+  /* Interface AlgorithmWithCounters and this member variable are only
    * for purposes of experiments. In a productive environment, remove both.
    */
   private int lastCounter = -1;
@@ -137,12 +137,17 @@ public class PukelsheimLS extends IterativeMethod implements AlgorithmWithCounte
   }
 
   @Override
-  public int getLastCounter() {
+  public int numberOfCounters() {
+    return 1;
+  }
+
+  @Override
+  public int getLastCounter(int i) {
     return lastCounter;
   }
 
   @Override
-  public String getCounterLabel() {
+  public String getCounterLabel(int i) {
     return "missingSeats";
   }
 }

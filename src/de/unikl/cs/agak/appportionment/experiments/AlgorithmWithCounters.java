@@ -20,21 +20,30 @@ package de.unikl.cs.agak.appportionment.experiments;
  * In order to not overburden or water down the functional interfaces,
  * we use this <strong>unsafe hack</strong> for getting counters.</p>
  *
- * <p>Method {@link AlgorithmWithCounter#getLastCounter()} return the value stored by the last
+ * <p>Method {@link AlgorithmWithCounters#getLastCounter(int)} return the value stored by the last
  * run of the algorithm. This is <em>not</em> assumed to be thread-safe,
  * so you better use each instance in a sequential fashion.</p>
  *
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-public interface AlgorithmWithCounter {
-    /**
-     * <strong>Warning:</strong> this is not thread-safe!
-     * @return The value stored by the last run of the algorithm
-     */
-    int getLastCounter();
+public interface AlgorithmWithCounters {
+  /**
+   * @return The number of counters.
+   */
+  int numberOfCounters();
 
     /**
-     * @return A name for the counter value.
+     * <strong>Warning:</strong> this is not thread-safe!
+     * @param i Counter index, starting with 0.
+     * @return The value stored by the i-th counter by the last run of the algorithm.
+     *    The result is not specified if <code>i < 0</code> or <code>i >= numberOfCounters()</code>.
      */
-    String getCounterLabel();
+    int getLastCounter(int i);
+
+    /**
+     * @param i Counter index, starting with 0.
+     * @return A name for the i-th counter value.
+     *    The result is not specified if <code>i < 0</code> or <code>i >= numberOfCounters()</code>.
+     */
+    String getCounterLabel(int i);
 }

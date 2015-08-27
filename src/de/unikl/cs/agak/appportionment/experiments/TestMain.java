@@ -25,9 +25,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static de.unikl.cs.agak.appportionment.experiments.ApportionmentInstanceFactory.UniformVotes;
 import static de.unikl.cs.agak.appportionment.util.AssortedUtils.isBinary;
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
-import static de.unikl.cs.agak.appportionment.experiments.ApportionmentInstanceFactory.*;
 import static edu.princeton.cs.introcs.StdStats.sum;
 
 /**
@@ -180,43 +180,49 @@ public class TestMain {
         }
 
         // Verify that the counters (if any) make sense
-        if ( algInst instanceof AlgorithmWithCounter ) {
-          final AlgorithmWithCounter awc = (AlgorithmWithCounter)algInst;
+        if ( algInst instanceof AlgorithmWithCounters ) {
+          final AlgorithmWithCounters awc = (AlgorithmWithCounters)algInst;
 
-          if ( "missingSeats".equals(awc.getCounterLabel()) ) {
+          if ( "missingSeats".equals(awc.getCounterLabel(0)) ) {
                         /* This is a Pukelsheim implementation. It should never have more than
                          * n resp. floor(n/2) seats missing or too many. */
             // TODO realistic? We do fuzzy stuff, after all
             final double divisor = algInst.isStationary() ? 2 : 1;
-            if ( Math.abs(awc.getLastCounter()) > n / divisor ) {
+            if ( Math.abs(awc.getLastCounter(0)) > n / divisor ) {
               errors.add("Estimator is off by too much"
                   + (algInst.isStationary() ? " for a stationary method" : "")
-                  + "; missed house size by " + awc.getLastCounter() + ".");
+                  + "; missed house size by " + awc.getLastCounter(0) + ".");
               correct = false;
             }
           }
-          else if ( "nrCands".equals(awc.getCounterLabel()) ) {
-                        /* This is SelectAStar. Check against the proven upper size bound. */
-            // TODO can we guess/recompute |I_x| externally?
+          else if ( "|I_x|".equals(awc.getCounterLabel(0)) ) {
+            // This is SelectAStar.
+            // Check that I_x was neither empty nor too large
+            if ( awc.getLastCounter(0) < 0 || awc.getLastCounter(0) > n ) {
+              errors.add("I_x has weird size: " + awc.getLastCounter(0));
+              correct = false;
+            }
+
+            // Check number of candidates against the proven upper size bound.
             if ( algInst.isStationary() ) {
               // Stationary method; upper bound 2n, plus allowance for fuzzy arithmetics
-              if ( awc.getLastCounter() > 3 * n ) {
+              if ( awc.getLastCounter(1) > 3 * n ) {
                 errors.add("Candidate set too large for stationary method: "
-                    + awc.getLastCounter());
+                    + awc.getLastCounter(1));
                 correct = false;
               }
             }
             else {
               // General bound of 2 * (1 + beta/alpha) * n, plus allowance for fuzzy arithmetics
-              if ( awc.getLastCounter() > (2 * (1 + inst.beta / inst.alpha) + 1) * n ) {
+              if ( awc.getLastCounter(1) > (2 * (1 + inst.beta / inst.alpha) + 1) * n ) {
                 errors.add("Candidate set too large: "
-                    + awc.getLastCounter());
+                    + awc.getLastCounter(1));
                 correct = false;
               }
             }
           }
           else {
-            errors.add("Untested counter '" + awc.getCounterLabel() + "'");
+            errors.add("Untested counter '" + awc.getCounterLabel(0) + "'");
             correct = false;
           }
         }

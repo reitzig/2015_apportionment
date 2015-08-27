@@ -200,8 +200,8 @@ public class RunningTimeMain {
       out = new BufferedWriter(new FileWriter("data" + System.getProperty("file.separator") +
           "times-" + name + ".tab"));
       writeSeparatedLine(out, "algo", "n", "k", "input-nr", "1/unit-size", "repetitions",
-          "total-ms", "single-run-ms", "single-run-ms/n", "counter",
-          "input-type", "alpha", "beta", "seed", "ns");
+          "total-ms", "single-run-ms", "single-run-ms/n",
+          "input-type", "alpha", "beta", "seed", "ns", "[counter counter/n]*");
 
       avgOut = new BufferedWriter(new FileWriter("data" + System.getProperty("file.separator") +
           "avgtimes-" + name + ".tab"));
@@ -260,12 +260,20 @@ public class RunningTimeMain {
               app.seats[i] -= 1;
             }
 
+            String counters = "-1";
+            if ( alg instanceof AlgorithmWithCounters ) {
+              final AlgorithmWithCounters awc = (AlgorithmWithCounters)alg;
+              counters = "";
+              for ( int i = 0; i < awc.numberOfCounters(); i++ ) {
+                counters = counters + SEP + awc.getLastCounter(i) + SEP + ((double)awc.getLastCounter(i)) / n;
+              }
+            }
             writeSeparatedLine(out, algoName, String.valueOf(n), String.valueOf(input.k), String.valueOf(inputNr),
                 String.valueOf(1 / app.astar), String.valueOf(repetitions), String.valueOf(millis),
                 String.valueOf(perRunMillis), String.valueOf(perRunMillis / n),
-                String.valueOf(alg instanceof AlgorithmWithCounter ? ((AlgorithmWithCounter)alg).getLastCounter() : -1),
                 inputType, String.valueOf(alpha), String.valueOf(beta), String.valueOf(seed),
-                "\"" + ns.toString().replaceAll("\\s+", "") + "\"");
+                "\"" + ns.toString().replaceAll("\\s+", "") + "\"",
+                counters);
             System.out.print("\33[1A\33[2K"); // Overwrite "inputNr=..." line so the shell is not totally swamped
           }
 
@@ -319,13 +327,13 @@ public class RunningTimeMain {
           "n",
           "ms/n");
       out.write("plot ");
-      int j = 0;
+      i = 0;
       for ( final String algoName : algoNames ) {
-        if ( j > 0 ) {
+        if ( i > 0 ) {
           out.write(",\\");
           out.newLine();
         }
-        else j++;
+        else i++;
         out.write("  \"<(grep -e " + algoName + "[[:space:]] \\\"data/avgtimes-" + name + ".tab\\\")\" using 2:4 ti \"" + algoName + "\"");
       }
       out.newLine();
@@ -353,27 +361,62 @@ public class RunningTimeMain {
         out.newLine();
         out.newLine();
 
+        // If this algorithm has counters, plot them as well
         final LinearApportionmentMethod dummyInst = algoInstance(algoName, 1.0, 1.0);
-        if ( dummyInst instanceof AlgorithmWithCounter ) {
-          // Another plot for the counters
-          setupPlot(out,
-              "plots/counters/counter-" + algoName + "-" + name + ".png",
-              algoName + "(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
-              "n",
-              ((AlgorithmWithCounter)dummyInst).getCounterLabel());
-          out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"data/times-" + name + ".tab\\\")\" using 2:10");
-          out.newLine();
-          out.newLine();
+        if ( dummyInst instanceof AlgorithmWithCounters ) {
+          final AlgorithmWithCounters awc = (AlgorithmWithCounters)dummyInst;
 
-          // And a scatterplots of counters vs times for each n
-          for ( int n : ns ) {
+          // Handle each counter separately
+          for ( int c = 0; c < awc.numberOfCounters(); c++ ) {
+            // One plot for the raw counter values
             setupPlot(out,
-                "plots/scatter/scatter-" + algoName + "-" + name + "-" + n + ".png",
-                algoName + "(" + alpha + "," + beta + ") on " + inputType + " for n=" + n + ", k=" + k,
-                ((AlgorithmWithCounter)dummyInst).getCounterLabel(),
+                "plots/counters/counter-" + algoName + "-" + name + "-" + awc.getCounterLabel(c) + ".png",
+                algoName + "(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+                "n",
+                awc.getCounterLabel(c));
+            out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"data/times-" + name + ".tab\\\")\" using 2:" + (15 + 2 * c));
+            out.newLine();
+            out.newLine();
+            // One for the normalized version
+            setupPlot(out,
+                "plots/counters/counterNorm-" + algoName + "-" + name + "-" + awc.getCounterLabel(c) + ".png",
+                algoName + "(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+                "n",
+                awc.getCounterLabel(c) + "/n");
+            out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"data/times-" + name + ".tab\\\")\" using 2:" + (15 + 2 * c + 1));
+            out.newLine();
+            out.newLine();
+
+            // And a scatterplots of counters vs times for each n
+            for ( int n : ns ) {
+              setupPlot(out,
+                  "plots/scatter/scatter-" + algoName + "-" + name + "-" + awc.getCounterLabel(c) + "-" + n + ".png",
+                  algoName + "(" + alpha + "," + beta + ") on " + inputType + " for n=" + n + ", k=" + k,
+                  awc.getCounterLabel(c),
+                  "ms");
+              out.write("plot \"<(grep -e " + algoName + "[[:space:]]" + n + "[[:space:]] " +
+                  "\\\"data/times-" + name + ".tab\\\")\" using " + (15 + 2 * c) + ":8");
+              out.newLine();
+              out.newLine();
+            }
+
+            // Aaand a scatterplot for all n vs time
+            setupPlot(out,
+                "plots/scatter/scatter-" + algoName + "-" + name + "-" + awc.getCounterLabel(c) + ".png",
+                algoName + "(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+                awc.getCounterLabel(c),
                 "ms");
-            out.write("plot \"<(grep -e " + algoName + "[[:space:]]" + n + "[[:space:]] " +
-                "\\\"data/times-" + name + ".tab\\\")\" using 10:9");
+            out.write("plot ");
+            i = 0;
+            for ( int n : ns ) {
+              if ( i > 0 ) {
+                out.write(",\\");
+                out.newLine();
+              }
+              else i++;
+              out.write("  \"<(grep -e " + algoName + "[[:space:]]" + n + "[[:space:]] " +
+                  "\\\"data/times-" + name + ".tab\\\")\" using " + (15 + 2 * c) + ":8");
+            }
             out.newLine();
             out.newLine();
           }
@@ -390,15 +433,17 @@ public class RunningTimeMain {
     return " (" + DateFormat.getTimeInstance().format(new Date()) + ")";
   }
 
-  private static void warmup(final List<String> algoNames, final double alpha,
-                             final double beta)
-      throws InvocationTargetException, NoSuchMethodException, InstantiationException,
-      IllegalAccessException {// warumup
+  private static void warmup(final List<String> algoNames, final double alpha, final double beta)
+      throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
     System.out.println("Starting warmup" + now());
 
+    SedgewickRandom r = SedgewickRandom.instance;
     for ( int i = 0; i < 12000; ++i ) {
+      final VoteFactory[] vfs = new VoteFactory[] {
+          UniformVotes, ExponentialVotes, PoissonVotes, Pareto1_5Votes, Pareto2Votes, Pareto3Votes
+      };
       final ApportionmentInstance instance =
-          ApportionmentInstanceFactory.randomInstance(SedgewickRandom.instance, UniformVotes, 30, new ApportionmentInstanceFactory.KFactory(5));
+          ApportionmentInstanceFactory.randomInstance(r, vfs[r.uniform(0, vfs.length)], 50, new ApportionmentInstanceFactory.KFactory(5));
       for ( final String algoName : algoNames ) {
         algoInstance(algoName, alpha, beta).apportion(instance);
       }
