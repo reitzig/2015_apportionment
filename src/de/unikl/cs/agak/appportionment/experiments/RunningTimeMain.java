@@ -245,11 +245,24 @@ public class RunningTimeMain {
             final ApportionmentInstance input = ApportionmentInstanceFactory.randomInstance(random, vf, n, k);
             Apportionment app = null;
 
-            final long startTime = System.nanoTime();
-            for ( int r = 0; r < repetitions; ++r ) {
-              app = alg.apportion(input);
+            final long startTime;
+            final long endTime;
+            try {
+              startTime = System.nanoTime();
+              for ( int r = 0; r < repetitions; ++r ) {
+                app = alg.apportion(input);
+              }
+              endTime = System.nanoTime();
             }
-            final long endTime = System.nanoTime();
+            catch ( Exception e ) {
+              System.err.println("Critical error during experiment; this should not happen!");
+              System.err.println(e.getMessage());
+              e.printStackTrace(System.err);
+              System.err.println("Happened for " + alg + " on:");
+              System.err.println(input.toString());
+              continue;
+            }
+
             final long nanos = endTime - startTime;
             final double millis = nanos / 1000. / 1000;
             final double perRunMillis = millis / repetitions;
