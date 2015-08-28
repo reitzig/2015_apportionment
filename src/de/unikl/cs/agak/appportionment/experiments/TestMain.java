@@ -51,10 +51,10 @@ public class TestMain {
       IterativeDMPQ.class,
       PukelsheimLS.class,
       PukelsheimPQ.class,
-      AStarChengEppstein.class,
-      SelectAStar.class,
-      SelectAStarNaive.class,
-      SelectAStarWithOptimalityCheck.class
+      ChengEppsteinSelect.class,
+      SandwichSelect.class,
+      SandwichSelectNaive.class,
+      SandwichSelectWithOptimalityCheck.class
   );
 
   public static void main(final String[] args) throws Exception {
@@ -196,7 +196,7 @@ public class TestMain {
             }
           }
           else if ( "|I_x|".equals(awc.getCounterLabel(0)) ) {
-            // This is SelectAStar.
+            // This is SandwichSelect.
             // Check that I_x was neither empty nor too large
             if ( awc.getLastCounter(0) < 0 || awc.getLastCounter(0) > n ) {
               errors.add("I_x has weird size: " + awc.getLastCounter(0));

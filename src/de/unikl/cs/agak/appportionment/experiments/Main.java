@@ -29,7 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static de.unikl.cs.agak.appportionment.experiments.ApportionmentInstanceFactory.*;
+import static de.unikl.cs.agak.appportionment.experiments.ApportionmentInstanceFactory.ExponentialVotes;
+import static de.unikl.cs.agak.appportionment.experiments.ApportionmentInstanceFactory.UniformVotes;
 import static edu.princeton.cs.introcs.StdStats.sum;
 
 @Deprecated
@@ -37,9 +38,9 @@ class Main {
 	public static void main(String[] args) throws Exception {
 
 //		final LinearApportionmentMethod m = new PukelsheimPQ(1,1.5);
-//		final LinearApportionmentMethod m = new SelectAStar(1.353375202278564,1.9663096697020648);
-//		final LinearApportionmentMethod m = new SelectAStar(1.35,1.96);
-		final LinearApportionmentMethod m = new PukelsheimLS( 1.2196377621480445,1.2774171590615349);
+//		final LinearApportionmentMethod m = new SandwichSelect(1.353375202278564,1.9663096697020648);
+//		final LinearApportionmentMethod m = new SandwichSelect(1.35,1.96);
+    final LinearApportionmentMethod m = new PukelsheimLS( 1.2196377621480445,1.2774171590615349);
 		final ApportionmentInstance instance = new ApportionmentInstance(
 			  new double[]{25.0, 68.0, 76.0, 26.0, 55.0, 19.0, 31.0, 48.0, 81.0, 10.0, 80.0}, 44);
 //		final ApportionmentInstance instance = new ApportionmentInstance(
@@ -68,8 +69,8 @@ class Main {
 //		final double v = new SelectAStarPrimitive(1, 1).unitSize(
 //			  new double[]{79.0, 92.0, 47.0, 4.0, 74.0, 68.0, 2.0, 3.0, 12.0, 94.0}, 4);
 //		System.out.println("1/v = " + 1/v);
-//		new SelectAStar(2,1).unitSize(new double[]{30.0, 150.0},4);
-//		new SelectAStar(2,1).unitSize(new double[]{20.0, 30.0, 150.0, 17.0, 3.0},4);
+//		new SandwichSelect(2,1).unitSize(new double[]{30.0, 150.0},4);
+//		new SandwichSelect(2,1).unitSize(new double[]{20.0, 30.0, 150.0, 17.0, 3.0},4);
 
 //		runAllOn(Instance.uniformRandomInstance(1000), 1, 1);
 //		for (int i = 0; i < 10; ++i)
@@ -127,10 +128,10 @@ class Main {
 		for (int i = 0; i < 12000; ++i) {
 			final ApportionmentInstance
 				  instance = ApportionmentInstanceFactory.randomInstance(SedgewickRandom.instance, UniformVotes, 30, new ApportionmentInstanceFactory.KFactory(5,10));
-            new SelectAStarNaive(2, 1).apportion(instance);
-            new SelectAStarWithOptimalityCheck(2, 1).apportion(instance);
-            new SelectAStar(2, 1).apportion(instance);
-            new AStarChengEppstein(2, 1).apportion(instance);
+      new SandwichSelectNaive(2, 1).apportion(instance);
+      new SandwichSelectWithOptimalityCheck(2, 1).apportion(instance);
+      new SandwichSelect(2, 1).apportion(instance);
+      new ChengEppsteinSelect(2, 1).apportion(instance);
             new IterativeDMPQ(2, 1).apportion(instance);
             new IterativeDMLS(2, 1).apportion(instance);
             new PukelsheimPQ(2, 1).apportion(instance);
@@ -175,11 +176,11 @@ class Main {
 	private static void runAllOn(ApportionmentInstance instance, double alpha, double beta)
 		  throws Exception {
 		List<LinearApportionmentMethod> algs = Arrays.asList(
-		  new SelectAStarNaive(alpha, beta),
-		  new SelectAStarWithOptimalityCheck(alpha, beta),
-		  new AStarChengEppstein(alpha, beta),
-			new SelectAStar(alpha, beta),
-			new IterativeDMPQ(alpha, beta),
+        new SandwichSelectNaive(alpha, beta),
+        new SandwichSelectWithOptimalityCheck(alpha, beta),
+        new ChengEppsteinSelect(alpha, beta),
+        new SandwichSelect(alpha, beta),
+        new IterativeDMPQ(alpha, beta),
 			new IterativeDMPQ(alpha, beta),
 			new PukelsheimPQ(alpha, beta));
 		runAlgsOn(instance, algs);
@@ -188,10 +189,10 @@ class Main {
 	private static void runLinearAlgsOn(ApportionmentInstance instance, double alpha, double beta)
 		  throws Exception {
 		List<LinearApportionmentMethod> algs = Arrays.asList(
-		  new SelectAStarWithOptimalityCheck(alpha, beta),
-		  new AStarChengEppstein(alpha, beta),
-		  new SelectAStar(alpha, beta),
-			new IterativeDMLS(alpha, beta),
+        new SandwichSelectWithOptimalityCheck(alpha, beta),
+        new ChengEppsteinSelect(alpha, beta),
+        new SandwichSelect(alpha, beta),
+        new IterativeDMLS(alpha, beta),
 			new IterativeDMPQ(alpha, beta),
 			new PukelsheimPQ(alpha, beta));
 		runAlgsOn(instance, algs);
@@ -239,10 +240,10 @@ class Main {
 
 			System.out.println("\n\nk = " + k);
 
-			LinearApportionmentMethod ce = new AStarChengEppstein(alpha, beta);
-			LinearApportionmentMethod sel = new SelectAStarWithOptimalityCheck(alpha, beta);
-			LinearApportionmentMethod pri = new SelectAStarNaive(alpha, beta);
-			LinearApportionmentMethod puk = new PukelsheimPQ(alpha, beta);
+      LinearApportionmentMethod ce = new ChengEppsteinSelect(alpha, beta);
+      LinearApportionmentMethod sel = new SandwichSelectWithOptimalityCheck(alpha, beta);
+      LinearApportionmentMethod pri = new SandwichSelectNaive(alpha, beta);
+      LinearApportionmentMethod puk = new PukelsheimPQ(alpha, beta);
             System.out.println("\tExample: " + sel.apportion(example) + "");
             System.out.println("\tExample: " + pri.apportion(example) + "");
             System.out.println("\tExample 1/unit: " + 1 / sel.apportion(example).astar + "");

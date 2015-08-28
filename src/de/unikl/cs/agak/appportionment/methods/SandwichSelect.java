@@ -29,18 +29,18 @@ import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
  * Implements the linear-time apportionment algorithm from
  * <dir>
  * Reitzig, R. and Wild, S.<br/>
- * A Simple and Fast Linear-Time Algorithm for Proportional Apportionment<br/>
+ * A Practical and Worst-Case Efficient Algorithm for Divide-and-Round Apportionment<br/>
  * arXiv:1504.06475 (2015)
  * </dir>
  */
-public class SelectAStar extends SelectionBasedMethod implements AlgorithmWithCounters {
+public class SandwichSelect extends SelectionBasedMethod implements AlgorithmWithCounters {
   /* Interface AlgorithmWithCounters and this member variable are only
    * for purposes of experiments. In a productive environment, remove both.
    */
   private int lastIx = -1;
   private int lastCandSize = -1;
 
-  public SelectAStar(final double alpha, final double beta) {
+  public SandwichSelect(final double alpha, final double beta) {
     super(alpha, beta);
   }
 

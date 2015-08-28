@@ -470,19 +470,19 @@ public class RunningTimeMain {
   public static Map<String, String> abbreviations = new HashMap<>();
 
   static {
-    algorithms.put("SelectAstarNaive", SelectAStarNaive.class);
-    algorithms.put("SelectAstarOptimalityCheck", SelectAStarWithOptimalityCheck.class);
-    algorithms.put("SelectAstar", SelectAStar.class);
-    algorithms.put("AStarChengEppstein", AStarChengEppstein.class);
+    //algorithms.put("SelectAstarNaive", SandwichSelectNaive.class);
+    //algorithms.put("SelectAstarOptimalityCheck", SandwichSelectWithOptimalityCheck.class);
+    algorithms.put("SandwichSelect", SandwichSelect.class);
+    algorithms.put("ChengEppsteinSelect", ChengEppsteinSelect.class);
     algorithms.put("IterativeDMLS", IterativeDMLS.class);
     algorithms.put("IterativeDMPQ", IterativeDMPQ.class);
     algorithms.put("PukelsheimLS", PukelsheimLS.class);
     algorithms.put("PukelsheimPQ", PukelsheimPQ.class);
 
-    abbreviations.put("naive", "SelectAstarNaive");
-    abbreviations.put("n", "SelectAstarNaive");
-    abbreviations.put("rw", "SelectAstar");
-    abbreviations.put("ce", "AStarChengEppstein");
+    //abbreviations.put("naive", "SelectAstarNaive");
+    //abbreviations.put("n", "SelectAstarNaive");
+    abbreviations.put("rw", "SandwichSelect");
+    abbreviations.put("ce", "ChengEppsteinSelect");
     abbreviations.put("dmpq", "IterativeDMPQ");
     abbreviations.put("dmls", "IterativeDMLS");
     abbreviations.put("puls", "PukelsheimLS");

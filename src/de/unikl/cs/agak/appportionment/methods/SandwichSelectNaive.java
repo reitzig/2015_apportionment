@@ -19,10 +19,11 @@ import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 
 import java.util.*;
 
-public class SelectAStarNaive extends SelectionBasedMethod {
+@Deprecated
+public class SandwichSelectNaive extends SelectionBasedMethod {
 
-	public SelectAStarNaive(final double alpha, final double beta) {
-		super(alpha, beta);
+  public SandwichSelectNaive(final double alpha, final double beta) {
+    super(alpha, beta);
 	}
 
 

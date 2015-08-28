@@ -23,10 +23,10 @@ import java.util.LinkedList;
 
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
 
-public class SelectAStarWithOptimalityCheck extends SelectionBasedMethod {
+public class SandwichSelectWithOptimalityCheck extends SelectionBasedMethod {
 
-	public SelectAStarWithOptimalityCheck(final double alpha, final double beta) {
-		super(alpha, beta);
+  public SandwichSelectWithOptimalityCheck(final double alpha, final double beta) {
+    super(alpha, beta);
 	}
 
     @Override

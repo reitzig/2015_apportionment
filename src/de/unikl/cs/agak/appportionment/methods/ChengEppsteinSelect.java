@@ -35,8 +35,8 @@ import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyFloor;
  *
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-public class AStarChengEppstein extends SelectionBasedMethod {
-    public AStarChengEppstein(double alpha, double beta) {
+public class ChengEppsteinSelect extends SelectionBasedMethod {
+  public ChengEppsteinSelect(double alpha, double beta) {
         super(alpha, beta);
     }
 
