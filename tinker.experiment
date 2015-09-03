@@ -1,3 +1,5 @@
+# algorithms ns ks repetitionsPerInput inputPerN randomSeed distribution alpha beta
+
 # k = 100*n, Sainte-Lague resp. D'Hondt (cf. typical European national parliament)
 #
 rw,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 NOW uniform 2 1
@@ -15,6 +17,7 @@ rw,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 NOW pareto1.5 1 1
 # upper bound on the candidate set of our algorithm. That is to make sure
 # we do not inadvertantly rig the experiment in our favor by cherry-picking 
 # one of several linear approximations.
+#
 rw,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 10 10000 100 NOW uniform 1 0.75
 rw,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 10 10000 100 NOW exponential 1 0.75
 rw,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 10 10000 100 NOW poisson 1 0.75
@@ -30,3 +33,7 @@ rw,ce,pupq      1000,5000,10000,20000,30000,40000,50000,75000,100000 5 10 100 NO
 rw,ce,pupq      1000,5000,10000,20000,30000,40000,50000,75000,100000 5 10 100 NOW exponential 2 1
 rw,ce,pupq      1000,5000,10000,20000,30000,40000,50000,75000,100000 5 10 100 NOW poisson 2 1
 rw,ce,pupq      1000,5000,10000,20000,30000,40000,50000,75000,100000 5 10 100 NOW pareto1.5 2 1
+
+# This experiments reproduces errors in CE 
+#
+ce	2,3,4,5,6,7,8,9,10	100	1	100	1440633623498683	poisson	2	1

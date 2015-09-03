@@ -1,15 +1,14 @@
-# k = 100*n, Sainte-Lague resp. D'Hondt (cf. typical European national parliament)
 # algorithms ns ks repetitionsPerInput inputPerN randomSeed distribution alpha beta
-#rw,pupq 100,500,1000,2000,5000,7500,10000 2 1 1000 4242424242 exponential 1 0.0001 
-#
+
 # Finding out that pareto3 hurts most
-#rw,pupq 1000000 2 1 100 4242424242 exponential 1 0.001 
-#rw,pupq 1000000 2 1 100 4242424242 pareto1.5 1 0.001 
-#rw,pupq 1000000 2 1 100 4242424242 pareto2 1 0.001 
-#rw,pupq 1000000 2 1 100 4242424242 pareto3 1 0.001 
-#
+rw,pupq 1000000 2 1 100 4242424242 exponential 1 0.001 
+rw,pupq 1000000 2 1 100 4242424242 pareto1.5 1 0.001 
+rw,pupq 1000000 2 1 100 4242424242 pareto2 1 0.001 
+rw,pupq 1000000 2 1 100 4242424242 pareto3 1 0.001 
+
 # Extreme scenario, favoring RW
-#rw,pupq 10000,100000,500000,1000000,1500000,2000000, 2 1 100 4242424242 pareto3 1 0.001 
-#
-# Intermediate, more realistic scenario
+rw,pupq 10000,100000,500000,1000000,1500000,2000000, 2 1 100 4242424242 pareto3 1 0.001 
+
+# Intermediate, more realistic scenario (split into manageable parts)
 rw,pupq 100,1000,5000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000 2 100 1000 4242424242 pareto2 1 0.001
+rw,pupq 100,1000,5000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000 2 100 1000 7777777777 pareto2 1 0.001

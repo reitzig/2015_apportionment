@@ -256,10 +256,13 @@ public class RunningTimeMain {
             }
             catch ( Exception e ) {
               System.err.println("Critical error during experiment; this should not happen!");
+              System.err.println("");
               System.err.println(e.getMessage());
               e.printStackTrace(System.err);
+              System.err.println("");
               System.err.println("Happened for " + alg + " on:");
               System.err.println(input.toString());
+              System.err.println();
               continue;
             }
 
