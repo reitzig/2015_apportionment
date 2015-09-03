@@ -7,25 +7,25 @@ apportionment with divisor methods. Inspect and use at your own risk.
      [`SandwichSelect.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SandwichSelect.java)
    contains an implementation of the algorithm `SandwichSelect` we have presented in
 
-   > Wild, S. and Reitzig, R.
-   > A Practical and Worst-Case Efficient Algorithm for Divisor Methods of Apportionment
-   > submitted
+   > Wild, S. and Reitzig, R.  
+   > A Practical and Worst-Case Efficient Algorithm for Divisor Methods of Apportionment  
+   > submitted  
    > [[preprint](http://arxiv.org/abs/1504.06475) (v2,2015)]
 
  * In
     [`ChengEppsteinSelect.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/ChengEppsteinSelect.java)
    we provide an implementation of the algorithm proposed in
 
-   > Cheng, Z. and Eppstein, D.
-   > [Linear-time Algorithms for Proportional  Apportionment](http://link.springer.com/chapter/10.1007/978-3-319-13075-0_46)
-   > In: International Symposium on Algorithms and Computation (ISAAC) 2014.
-   > Springer (2014)
+   > Cheng, Z. and Eppstein, D.  
+   > [Linear-time Algorithms for Proportional  Apportionment](http://link.springer.com/chapter/10.1007/978-3-319-13075-0_46)  
+   > In: International Symposium on Algorithms and Computation (ISAAC) 2014.  
+   > Springer (2014)  
    > [[preprint](http://arxiv.org/abs/1409.2603) (v1,2014)]
 
  * Furthermore, we implement the jump-and-step algorithm from
 
-   > Pukelsheim, F.
-   > Proportional Representation
+   > Pukelsheim, F.  
+   > Proportional Representation  
    > Springer, 2014
 
    in
