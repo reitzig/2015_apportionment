@@ -93,3 +93,7 @@ In case you can not get this to work, here is a workaround.
         java -cp ../build de.unikl.csgak.appportionment.experiments.RunningTimeMain [line]
  
  5. Execute `gnuplot tmp/*.gp`.
+ 
+*Hint:* For plotting purposes,
+you can use script `separate_by_alg` to split the `.tab`-files in `data` by algorithm. 
+If you need one file per input size, you can split *these* file using `separate_by_n`.
