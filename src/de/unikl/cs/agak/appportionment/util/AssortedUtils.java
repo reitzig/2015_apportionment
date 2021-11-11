@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import static edu.princeton.cs.introcs.StdStats.sum;
+import static de.unikl.cs.agak.appportionment.util.AssortedUtils.sum;
 
 /**
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
@@ -15,6 +15,50 @@ public class AssortedUtils {
             if ( i < 0 || i > 1 ) return false;
         return true;
     }
+
+
+
+    /**
+     * Returns the sum of all values in the specified array.
+     *
+     * @param  a the array
+     * @return the sum of all values in the array {@code a[]};
+     *         {@code 0.0} if no such value
+     */
+    public static double sum(double[] a) {
+        validateNotNull(a);
+        double sum = 0.0;
+        for (int i = 0; i < a.length; i++) {
+            sum += a[i];
+        }
+        return sum;
+    }
+
+
+    /**
+     * Returns the sum of all values in the specified array.
+     *
+     * @param  a the array
+     * @return the sum of all values in the array {@code a[]};
+     *         {@code 0.0} if no such value
+     */
+    public static int sum(int[] a) {
+        validateNotNull(a);
+        int sum = 0;
+        for (int i = 0; i < a.length; i++) {
+            sum += a[i];
+        }
+        return sum;
+    }
+
+
+    // throw an IllegalArgumentException if x is null
+    // (x is either of type double[] or int[])
+    private static void validateNotNull(Object x) {
+        if (x == null)
+            throw new IllegalArgumentException("argument is null");
+    }
+
 
     /**
      * Computes all possibilities to pick <code>i</code> ones from the given 0-1 vector <code>v</code>.

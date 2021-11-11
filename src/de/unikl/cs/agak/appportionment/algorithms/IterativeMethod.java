@@ -13,23 +13,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package de.unikl.cs.agak.appportionment.methods;
+package de.unikl.cs.agak.appportionment.algorithms;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.methods.DivisorMethod;
 
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyEquals;
 
 /**
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-abstract public class IterativeMethod extends LinearApportionmentMethod {
-
-    public IterativeMethod(double alpha, double beta) {
-        super(alpha, beta);
-    }
-
-    abstract public Apportionment apportion(ApportionmentInstance instance);
+abstract public class IterativeMethod implements ApportionmentAlgorithm {
 
     /**
      * Given <em>one</em> valid seat assignment, determine all possible ones
@@ -39,19 +34,19 @@ abstract public class IterativeMethod extends LinearApportionmentMethod {
      * @param astar The (reciprocal of) the proportionality constant.
      * @return A symbolic representation of all valid seat assignments for the given instance.
      */
-    Apportionment determineTies(final ApportionmentInstance instance, final int[] seats, final double astar) {
+    Apportionment determineTies(final ApportionmentInstance instance, final DivisorMethod dm, final int[] seats, final double astar) {
         final int[] tiedSeats = new int[seats.length];
 
         // TODO can we do this faster?
 	    int theOnlyTie = -1;
         for (int i = 0; i < seats.length; i++) {
-            if ( seats[i] > 0 && fuzzyEquals(astar, d(seats[i] - 1) / instance.votes[i]) ) {
+            if ( seats[i] > 0 && fuzzyEquals(astar, dm.d(seats[i] - 1) / instance.votes[i]) ) {
                 // Party i got a seat with value astar
                 seats[i] -= 1;
                 tiedSeats[i] = 1;
 	            if (theOnlyTie == -1) theOnlyTie = i; else theOnlyTie = -42;
             }
-            else if ( fuzzyEquals(astar, d(seats[i]) / instance.votes[i]) ) {
+            else if ( fuzzyEquals(astar, dm.d(seats[i]) / instance.votes[i]) ) {
                 // Party i did *not* get a seat, but also has value astar
                 // Note how we don't have to check the current value since the
                 // sequences are increasing.

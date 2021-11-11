@@ -1,5 +1,18 @@
-# algorithms ns ks repetitionsPerInput inputPerN randomSeed distribution alpha beta
-
+#   algorithms ns ks repetitionsPerInput inputsPerN randomSeed distribution divisorMethod
+#
+# where
+#  * 'algorithms'          is comma-separated list of any of 'rw', 'rwit', 'rw2, 
+#                            'ce', 'dmpq', 'dmls', 'pupq', 'puls'
+#  * 'ns'                  is a comma-separated list of integers
+#  * 'ks'                  is an integer, or a two-element comma-separated list 
+#                            of integers
+#  * 'repetitionsPerInput' is an integer
+#  * 'inputsPerN'          is an integer
+#  * 'randomSeed'          is an integer or the string 'NOW'
+#  * 'distribution'        is one of 'uniform', 'exponential', 'poisson', 'pareto1.5', 
+#                            'pareto2', 'pareto3'
+#  * 'divisorMethod'       is a method name or LDM(double,double)
+#
 # Finding out that pareto3 hurts most
 rw,pupq 1000000 2 1 100 4242424242 exponential 1 0.001 
 rw,pupq 1000000 2 1 100 4242424242 pareto1.5 1 0.001 
@@ -7,8 +20,9 @@ rw,pupq 1000000 2 1 100 4242424242 pareto2 1 0.001
 rw,pupq 1000000 2 1 100 4242424242 pareto3 1 0.001 
 
 # Extreme scenario, favoring RW
-rw,pupq 10000,100000,500000,1000000,1500000,2000000, 2 1 100 4242424242 pareto3 1 0.001 
+#rw,pupq 10000,100000,500000,1000000,1500000,2000000, 2 1 100 4242424242 pareto3 LDM(1,0.001)
+rw,pupq 100,1000,5000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000 2 100 1000 7777777777 pareto3 LDM(1,0.001)
 
 # Intermediate, more realistic scenario (split into manageable parts)
-rw,pupq 100,1000,5000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000 2 100 1000 4242424242 pareto2 1 0.001
-rw,pupq 100,1000,5000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000 2 100 1000 7777777777 pareto2 1 0.001
+rw,pupq 100,1000,5000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000 2 100 1000 4242424242 pareto2 LDM(1,0.001)
+rw,pupq 100,1000,5000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000 2 100 1000 7777777777 pareto2 LDM(1,0.001)

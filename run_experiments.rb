@@ -29,6 +29,10 @@ experiments = []
 
 ERRORPREFIX = '"Illegal line #{linec} in file #{f}: "'
 DISTRIBUTIONS = ["uniform", "exponential", "poisson", "pareto1.5", "pareto2", "pareto3"]
+METHODS = /(Smallest|Greatest)Divisors|(Modified)?SainteLague|HarmonicMean|EqualProportions|Imperiali|Danish|LDM\(\d*\.?\d+,\d*\.?\d+\)/
+METHODNAMES = ["SmallestDivisors", "GreatestDivisors", "ModifiedSainteLague", 
+               "SainteLague", "HarmonicMean", "EqualProportions", "Imperiali", 
+               "Danish", "LDM(double,double)"]
 
 puts "Reading experiment definitions..."
 ARGV.each { |f|
@@ -46,8 +50,8 @@ ARGV.each { |f|
         end
       
         params = line.split(/\s+/)
-        if ( params.size != 9 )
-          puts eval(ERRORPREFIX) + "need eight columns."
+        if ( params.size != 8 )
+          puts eval(ERRORPREFIX) + "need seven columns."
           next
         end
         
@@ -86,14 +90,12 @@ ARGV.each { |f|
           next
         end
         
-        (7..8).each { |i|
-          if ( /\d+(\.\d+)?/ =~ params[i] )
-            exp.push(params[i])
-          else
-            puts eval(ERRORPREFIX) + "column #{i+1} needs to be a float."
-            next
-          end
-        }
+        if ( METHODS =~ params[7] )
+          exp.push(params[7])
+        else
+          puts eval(ERRORPREFIX) + "column 8 needs to be one of #{METHODNAMES.join(", ")}."
+          next
+        end
 
         experiments.push(exp)
       }      
@@ -114,7 +116,7 @@ puts "Performing #{experiments.size} experiments..."
 puts "\t(Follow progress with 'tail -f #{dir}/experiments.log')"
 experiments.each { |e|
   `echo "#{e.join("\t")}" >> all.experiment`
-  `java -cp ../build de.unikl.cs.agak.appportionment.experiments.RunningTimeMain #{e.join(" ")} >> experiments.log 2>&1`
+  `java -cp ../build de.unikl.cs.agak.appportionment.experiments.RunningTimeMain #{e.map { |s| "\"#{s}\"" }.join(" ")} >> experiments.log 2>&1`
   `echo "\n\n\n" >> experiments.log`
 }
 `echo "Done." >> experiments.log`

@@ -17,7 +17,10 @@ package de.unikl.cs.agak.appportionment.experiments;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
-import de.unikl.cs.agak.appportionment.methods.*;
+import de.unikl.cs.agak.appportionment.algorithms.*;
+import de.unikl.cs.agak.appportionment.methods.AlmostLinearDivisorMethod;
+import de.unikl.cs.agak.appportionment.methods.LinearDivisorMethod;
+import de.unikl.cs.agak.appportionment.methods.examples.*;
 import de.unikl.cs.agak.appportionment.util.SedgewickRandom;
 
 import java.io.BufferedWriter;
@@ -26,12 +29,14 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static de.unikl.cs.agak.appportionment.experiments.ApportionmentInstanceFactory.*;
 
 /**
  * Executes running time experiments for all divisor method implementations in
- * {@link de.unikl.cs.agak.appportionment.methods}.
+ * {@link de.unikl.cs.agak.appportionment.algorithms}.
  *
  * @author Sebastian Wild (wild@cs.uni-kl.de)
  */
@@ -116,7 +121,7 @@ public class RunningTimeMain {
     int repetitions = 1;
     int inputsPerN = 1;
     String inputType = "uniform";
-    double alpha = 1, beta = 1;
+    AlmostLinearDivisorMethod dm = new LinearDivisorMethod(1, 1);
     long seed = System.currentTimeMillis();
 
     // Parse command-line parameters
@@ -150,10 +155,7 @@ public class RunningTimeMain {
       inputType = args[6];
     }
     if ( args.length >= 8 ) {
-      alpha = Double.parseDouble(args[7]);
-    }
-    if ( args.length >= 9 ) {
-      beta = Double.parseDouble(args[8]);
+      dm = dmInstance(args[7]);
     }
 
     final List<String> algoNames = new LinkedList<>();
@@ -165,8 +167,8 @@ public class RunningTimeMain {
         if ( algorithms.containsKey(algo) ) {
           algoNames.add(algo);
         }
-        else if ( abbreviations.containsKey(algo) ) {
-          algoNames.add(abbreviations.get(algo));
+        else if ( algAbbreviations.containsKey(algo) ) {
+          algoNames.add(algAbbreviations.get(algo));
         }
         else {
           throw new IllegalArgumentException("Unknown algorithm " + algo);
@@ -179,16 +181,15 @@ public class RunningTimeMain {
     System.out.println("repetitions = " + repetitions);
     System.out.println("algoNames = " + algoNames);
     System.out.println("inputType = " + inputType);
-    System.out.println("alpha = " + alpha);
-    System.out.println("beta = " + beta);
+    System.out.println("dm = " + dm);
     System.out.println("seed = " + seed);
 
-    warmup(algoNames, alpha, beta);
+    warmup(algoNames, dm);
 
     final String name = "N=" + ns.toString().replaceAll("\\s+", "") +
         "-K=" + k.toString() +
         "-votes=" + inputType +
-        "-(alpha,beta)=(" + alpha + "," + beta + ")" +
+        "-dm=" + dm +
         "-reps=" + repetitions +
         "-perN=" + inputsPerN +
         "-seed=" + seed;
@@ -201,7 +202,7 @@ public class RunningTimeMain {
           "times-" + name + ".tab"));
       writeSeparatedLine(out, "algo", "n", "k", "input-nr", "1/unit-size", "repetitions",
           "total-ms", "single-run-ms", "single-run-ms/n",
-          "input-type", "alpha", "beta", "seed", "ns", "[counter counter/n]*");
+          "input-type", "dm", "seed", "ns", "[counter counter/n]*");
 
       avgOut = new BufferedWriter(new FileWriter("data" + System.getProperty("file.separator") +
           "avgtimes-" + name + ".tab"));
@@ -209,7 +210,8 @@ public class RunningTimeMain {
 
       for ( final String algoName : algoNames ) {
         final SedgewickRandom random = new SedgewickRandom(seed);
-        final LinearApportionmentMethod alg = algoInstance(algoName, alpha, beta);
+
+        final ApportionmentAlgorithm alg = algoInstance(algoName);
         System.out.println("\n\n\nStarting with algo " + algoName + now());
 
         for ( final int n : ns ) {
@@ -250,7 +252,7 @@ public class RunningTimeMain {
             try {
               startTime = System.nanoTime();
               for ( int r = 0; r < repetitions; ++r ) {
-                app = alg.apportion(input);
+                app = alg.apportion(input, dm);
               }
               endTime = System.nanoTime();
             }
@@ -287,7 +289,7 @@ public class RunningTimeMain {
             writeSeparatedLine(out, algoName, String.valueOf(n), String.valueOf(input.k), String.valueOf(inputNr),
                 String.valueOf(1 / app.astar), String.valueOf(repetitions), String.valueOf(millis),
                 String.valueOf(perRunMillis), String.valueOf(perRunMillis / n),
-                inputType, String.valueOf(alpha), String.valueOf(beta), String.valueOf(seed),
+                inputType, dm.toString(), String.valueOf(seed),
                 "\"" + ns.toString().replaceAll("\\s+", "") + "\"",
                 counters);
             System.out.print("\33[1A\33[2K"); // Overwrite "inputNr=..." line so the shell is not totally swamped
@@ -320,7 +322,7 @@ public class RunningTimeMain {
       // Averages per size in one plot
       setupPlot(out,
           "plots/averages/avgtimes-" + name + ".png",
-          "_(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+          dm + " on " + inputType + " votes for k=" + k,
           "n",
           "ms");
       out.write("plot ");
@@ -339,7 +341,7 @@ public class RunningTimeMain {
       // Averages per size normalized by n in one plot
       setupPlot(out,
           "plots/averages/avgtimesNorm-" + name + ".png",
-          "_(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+          dm + " on " + inputType + " votes for k=" + k,
           "n",
           "ms/n");
       out.write("plot ");
@@ -360,7 +362,7 @@ public class RunningTimeMain {
         // One plot with all points per algorithm
         setupPlot(out,
             "plots/times/times-" + algoName + "-" + name + ".png",
-            algoName + "(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+            algoName + " with " + dm + " on " + inputType + " votes for k=" + k,
             "n",
             "ms");
         out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"data/times-" + name + ".tab\\\")\" using 2:8");
@@ -370,7 +372,7 @@ public class RunningTimeMain {
         // Another with the same times, but normalized
         setupPlot(out,
             "plots/times/timesNorm-" + algoName + "-" + name + ".png",
-            algoName + "(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+            algoName + " with " + dm + " on " + inputType + " votes for k=" + k,
             "n",
             "ms/n");
         out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"data/times-" + name + ".tab\\\")\" using 2:9");
@@ -378,7 +380,7 @@ public class RunningTimeMain {
         out.newLine();
 
         // If this algorithm has counters, plot them as well
-        final LinearApportionmentMethod dummyInst = algoInstance(algoName, 1.0, 1.0);
+        final ApportionmentAlgorithm dummyInst = algoInstance(algoName);
         if ( dummyInst instanceof AlgorithmWithCounters ) {
           final AlgorithmWithCounters awc = (AlgorithmWithCounters)dummyInst;
 
@@ -387,19 +389,19 @@ public class RunningTimeMain {
             // One plot for the raw counter values
             setupPlot(out,
                 "plots/counters/counter-" + algoName + "-" + name + "-" + awc.getCounterLabel(c) + ".png",
-                algoName + "(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+                algoName + " with " + dm + " on " + inputType + " votes for k=" + k,
                 "n",
                 awc.getCounterLabel(c));
-            out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"data/times-" + name + ".tab\\\")\" using 2:" + (15 + 2 * c));
+            out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"data/times-" + name + ".tab\\\")\" using 2:" + (14 + 2 * c));
             out.newLine();
             out.newLine();
             // One for the normalized version
             setupPlot(out,
                 "plots/counters/counterNorm-" + algoName + "-" + name + "-" + awc.getCounterLabel(c) + ".png",
-                algoName + "(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+                algoName + " with " + dm + " on " + inputType + " votes for k=" + k,
                 "n",
                 awc.getCounterLabel(c) + "/n");
-            out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"data/times-" + name + ".tab\\\")\" using 2:" + (15 + 2 * c + 1));
+            out.write("plot \"<(grep -e " + algoName + "[[:space:]] \\\"data/times-" + name + ".tab\\\")\" using 2:" + (14 + 2 * c + 1));
             out.newLine();
             out.newLine();
 
@@ -407,11 +409,11 @@ public class RunningTimeMain {
             for ( int n : ns ) {
               setupPlot(out,
                   "plots/scatter/scatter-" + algoName + "-" + name + "-" + awc.getCounterLabel(c) + "-" + n + ".png",
-                  algoName + "(" + alpha + "," + beta + ") on " + inputType + " for n=" + n + ", k=" + k,
+                  algoName + " with " + dm + " on " + inputType + " votes for n=" + n + ", k=" + k,
                   awc.getCounterLabel(c),
                   "ms");
               out.write("plot \"<(grep -e " + algoName + "[[:space:]]" + n + "[[:space:]] " +
-                  "\\\"data/times-" + name + ".tab\\\")\" using " + (15 + 2 * c) + ":8");
+                  "\\\"data/times-" + name + ".tab\\\")\" using " + (14 + 2 * c) + ":8");
               out.newLine();
               out.newLine();
             }
@@ -419,7 +421,7 @@ public class RunningTimeMain {
             // Aaand a scatterplot for all n vs time
             setupPlot(out,
                 "plots/scatter/scatter-" + algoName + "-" + name + "-" + awc.getCounterLabel(c) + ".png",
-                algoName + "(" + alpha + "," + beta + ") on " + inputType + " for k=" + k,
+                algoName + " with " + dm + " on " + inputType + " votes for k=" + k,
                 awc.getCounterLabel(c),
                 "ms");
             out.write("plot ");
@@ -431,7 +433,7 @@ public class RunningTimeMain {
               }
               else i++;
               out.write("  \"<(grep -e " + algoName + "[[:space:]]" + n + "[[:space:]] " +
-                  "\\\"data/times-" + name + ".tab\\\")\" using " + (15 + 2 * c) + ":8");
+                  "\\\"data/times-" + name + ".tab\\\")\" using " + (14 + 2 * c) + ":8");
             }
             out.newLine();
             out.newLine();
@@ -449,7 +451,7 @@ public class RunningTimeMain {
     return " (" + DateFormat.getTimeInstance().format(new Date()) + ")";
   }
 
-  private static void warmup(final List<String> algoNames, final double alpha, final double beta)
+  private static void warmup(final List<String> algoNames, final AlmostLinearDivisorMethod dm)
       throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
     System.out.println("Starting warmup" + now());
 
@@ -461,16 +463,17 @@ public class RunningTimeMain {
       final ApportionmentInstance instance =
           ApportionmentInstanceFactory.randomInstance(r, vfs[r.uniform(0, vfs.length)], 50, new ApportionmentInstanceFactory.KFactory(5));
       for ( final String algoName : algoNames ) {
-        algoInstance(algoName, alpha, beta).apportion(instance);
+        algoInstance(algoName).apportion(instance, dm);
       }
     }
 
     System.out.println("Warumup finished" + now());
   }
 
-  public static Map<String, Class<? extends LinearApportionmentMethod>> algorithms =
-      new LinkedHashMap<>();
-  public static Map<String, String> abbreviations = new HashMap<>();
+  public static Map<String, Class<? extends ApportionmentAlgorithm>> algorithms = new LinkedHashMap<>();
+  public static Map<String, Class<? extends AlmostLinearDivisorMethod>> methods = new LinkedHashMap<>();
+  public static Map<String, String> algAbbreviations = new HashMap<>();
+  public static Pattern ldmSpec = Pattern.compile("\\ALDM\\((?<alpha>\\d*\\.?\\d+),(?<beta>\\d*\\.?\\d+)\\)\\z");
 
   static {
     //algorithms.put("SelectAstarNaive", SandwichSelectNaive.class);
@@ -482,21 +485,54 @@ public class RunningTimeMain {
     algorithms.put("PukelsheimLS", PukelsheimLS.class);
     algorithms.put("PukelsheimPQ", PukelsheimPQ.class);
 
-    //abbreviations.put("naive", "SelectAstarNaive");
-    //abbreviations.put("n", "SelectAstarNaive");
-    abbreviations.put("rw", "SandwichSelect");
-    abbreviations.put("ce", "ChengEppsteinSelect");
-    abbreviations.put("dmpq", "IterativeDMPQ");
-    abbreviations.put("dmls", "IterativeDMLS");
-    abbreviations.put("puls", "PukelsheimLS");
-    abbreviations.put("pupq", "PukelsheimPQ");
+    algAbbreviations.put("rw", "SandwichSelect");
+    algAbbreviations.put("rwit", "SandwichSelectIter");
+    algAbbreviations.put("ce", "ChengEppsteinSelect");
+    algAbbreviations.put("dmls", "IterativeDMLS");
+    algAbbreviations.put("dmpq", "IterativeDMPQ");
+    algAbbreviations.put("puls", "PukelsheimLS");
+    algAbbreviations.put("pupq", "PukelsheimPQ");
+
+    // Legacy:
+    algorithms.put("SandwichSelectIter", SandwichSelectIter.class);
+    algorithms.put("SandwichSelectV2", SandwichSelectV2.class);
+    algAbbreviations.put("rw3", "SandwichSelect");
+    algAbbreviations.put("rw3it", "SandwichSelectIter");
+    algAbbreviations.put("rw2", "SandwichSelectV2");
+
+    methods.put("SmallestDivisors", SmallestDivisors.class);
+    methods.put("GreatestDivisors", GreatestDivisors.class);
+    methods.put("SainteLague", SainteLague.class);
+    methods.put("ModifiedSainteLague", ModifiedSainteLague.class);
+    methods.put("HarmonicMean", HarmonicMean.class);
+    methods.put("EqualProportions", EqualProportions.class);
+    methods.put("Imperiali", Imperiali.class);
+    methods.put("Danish", Danish.class);
   }
 
-  public static LinearApportionmentMethod algoInstance(String name, double alpha, double beta)
+  public static ApportionmentAlgorithm algoInstance(String name)
       throws IllegalAccessException, InstantiationException, NoSuchMethodException,
       InvocationTargetException {
-    return algorithms.get(name).getConstructor(double.class, double.class).newInstance(
-        alpha, beta);
+    name = algAbbreviations.containsKey(name) ? algAbbreviations.get(name) : name;
+    return algorithms.get(name).getConstructor().newInstance();
   }
+
+  public static AlmostLinearDivisorMethod dmInstance(String name)
+        throws IllegalAccessException, InstantiationException, NoSuchMethodException,
+        InvocationTargetException {
+      if ( methods.containsKey(name) ) {
+        return methods.get(name).getConstructor().newInstance();
+      }
+      else {
+        Matcher m = ldmSpec.matcher(name);
+        if ( m.matches() ) {
+          return new LinearDivisorMethod(Double.parseDouble(m.group("alpha")), Double.parseDouble(m.group("beta")));
+        }
+        else {
+          throw new IllegalArgumentException("No divisor method with name '" + name + "'.");
+        }
+      }
+
+    }
 
 }

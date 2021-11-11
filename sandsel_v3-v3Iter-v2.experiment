@@ -1,0 +1,26 @@
+# Some quick experiments to compare different implementations of our algorithm.
+# k = 50*n, different methods and distributions
+
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW uniform GreatestDivisors
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW uniform SainteLague
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW uniform ModifiedSainteLague
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW uniform EqualProportions
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW uniform HarmonicMean
+
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW exponential GreatestDivisors
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW exponential SainteLague
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW exponential ModifiedSainteLague
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW exponential EqualProportions
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW exponential HarmonicMean
+
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW poisson GreatestDivisors
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW poisson SainteLague
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW poisson ModifiedSainteLague
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW poisson EqualProportions
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW poisson HarmonicMean
+
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW pareto1.5 GreatestDivisors
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW pareto1.5 SainteLague
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW pareto1.5 ModifiedSainteLague
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW pareto1.5 EqualProportions
+rw3,rw2,rw3it 5,10,15,20,25,30,35,40,45,50,100,150,200 50 7500 200 NOW pareto1.5 HarmonicMean

@@ -22,7 +22,7 @@ import java.util.Collection;
 
 import static de.unikl.cs.agak.appportionment.util.AssortedUtils.isBinary;
 import static de.unikl.cs.agak.appportionment.util.AssortedUtils.kSubsets;
-import static edu.princeton.cs.introcs.StdStats.sum;
+import static de.unikl.cs.agak.appportionment.util.AssortedUtils.sum;
 
 /**
  * Represents a result of apportionment, that is a set of valid seat assignments.

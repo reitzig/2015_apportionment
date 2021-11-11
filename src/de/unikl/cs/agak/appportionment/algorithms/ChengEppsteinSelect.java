@@ -13,9 +13,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package de.unikl.cs.agak.appportionment.methods;
+package de.unikl.cs.agak.appportionment.algorithms;
 
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.methods.AlmostLinearDivisorMethod;
+import de.unikl.cs.agak.appportionment.methods.DivisorMethod;
+import de.unikl.cs.agak.appportionment.methods.LinearDivisorMethod;
 import de.unikl.cs.agak.appportionment.util.RankSelection;
 
 import java.util.Collection;
@@ -35,18 +38,22 @@ import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyFloor;
  *
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-public class ChengEppsteinSelect extends SelectionBasedMethod {
-  public ChengEppsteinSelect(double alpha, double beta) {
-        super(alpha, beta);
-    }
+public class ChengEppsteinSelect extends SelectionBasedAlgorithm {
+
 
     @Override
-    double unitSize(final ApportionmentInstance instance) {
+    double unitSize(final ApportionmentInstance instance, final DivisorMethod dm) {
+      if (  !(dm instanceof LinearDivisorMethod) ) {
+        // TODO CE claim it works for ALDM as well but tests fail!
+        //            It loops for ModSL and throws an NPE for EqualProp and HarmonicMean.
+        throw new IllegalArgumentException(this.getClass().getSimpleName() + " only works for linear divisor sequences");
+      }
+
         // Initialize sequences
         // TODO move to 𝒜, ξ? Seems to skrew with most IDEs, though.
         Collection<Sequence> A = new LinkedList<>();
         for (double v_i : instance.votes) {
-            A.add(new Sequence(v_i));
+            A.add(new Sequence(v_i, (AlmostLinearDivisorMethod)dm));
         }
 
         Collection<Sequence> C = findContributingSequences(A, instance.k);
@@ -282,9 +289,11 @@ public class ChengEppsteinSelect extends SelectionBasedMethod {
      */
     private class Sequence {
         private double v_i; // Population
+        private final AlmostLinearDivisorMethod dm;
 
-        Sequence(double v_i) {
-            this.v_i = v_i;
+        Sequence(double v_i, AlmostLinearDivisorMethod dm) {
+          this.v_i = v_i;
+          this.dm = dm;
         }
 
         // Stuff from paper; more or less verbatim. Hopefully equivalent.
@@ -310,16 +319,16 @@ public class ChengEppsteinSelect extends SelectionBasedMethod {
         }
 
         double x_A() {
-            return d(0) / v_i;
+            return dm.d(0) / v_i;
         }
 
         double y_A() {
-            return alpha / v_i;
+            return dm.getAlpha() / v_i;
         }
 
         double jth(int j) {
 	        if (j < 0) throw new IllegalArgumentException();
-            return d(j) / v_i;
+            return dm.d(j) / v_i;
         }
     }
 }
