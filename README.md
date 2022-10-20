@@ -64,7 +64,7 @@ Max-Min Inequality for *all* computed assignments, i.e. for all ways to resolve 
 Command `ant run` executes a sample runtime experiment.
 
 Run your own experiments by defining the parameters in a space-separated file
-(see e.g. [arxiv2.experiment](https://github.com/reitzig/2015_apportionment/blob/master/arxiv3.experiment); those are the ones from the article)
+(see e.g. [arxiv2.experiment](https://github.com/reitzig/2015_apportionment/blob/master/arxiv2.experiment); those are the ones from the article)
 and passing it as parameter to [`run_experiments.rb`](https://github.com/reitzig/2015_apportionment/blob/master/run_experiments.rb).
 That is, 
 
