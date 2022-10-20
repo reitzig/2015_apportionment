@@ -13,32 +13,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package de.unikl.cs.agak.appportionment.methods;
+package de.unikl.cs.agak.appportionment.algorithms;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.methods.DivisorMethod;
 
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.fuzzyEquals;
 
 /**
  * @author Raphael Reitzig (reitzig@cs.uni-kl.de)
  */
-abstract public class SelectionBasedMethod extends LinearApportionmentMethod {
-  SelectionBasedMethod(double alpha, double beta) {
-    super(alpha, beta);
-  }
+abstract public class SelectionBasedAlgorithm implements ApportionmentAlgorithm {
 
   @Override
-  final public Apportionment apportion(final ApportionmentInstance instance) {
+  final public Apportionment apportion(final ApportionmentInstance instance, final DivisorMethod method) {
     final int n = instance.votes.length;
 
     // Compute $a^*$
-    final double astar = unitSize(instance);
+    final double astar = unitSize(instance, method);
 
     // Derive seats
     final int[] seats = new int[n];
     for ( int i = 0; i < n; i++ ) {
-      seats[i] = dRound(instance.votes[i] * astar) + 1;
+      seats[i] = method.dRound(instance.votes[i] * astar) + 1;
     }
 
     // Now we have *all* seats with value astar, which may be too many.
@@ -47,7 +45,7 @@ abstract public class SelectionBasedMethod extends LinearApportionmentMethod {
     final int[] tiedSeats = new int[n];
     for ( int i = 0; i < n; i++ ) {
       if ( seats[i] == 0 ) {
-        if ( fuzzyEquals(d(0) / instance.votes[i], astar) ) {
+        if ( fuzzyEquals(method.d(0) / instance.votes[i], astar) ) {
           tiedSeats[i] = 1;
           if ( theOnlyTie == -1 ) theOnlyTie = i;
           else theOnlyTie = -42;
@@ -55,7 +53,7 @@ abstract public class SelectionBasedMethod extends LinearApportionmentMethod {
           throw new IllegalStateException();
         }
       }
-      else if ( fuzzyEquals(d(seats[i] - 1) / instance.votes[i], astar) ) {
+      else if ( fuzzyEquals(method.d(seats[i] - 1) / instance.votes[i], astar) ) {
         tiedSeats[i] = 1;
         seats[i] -= 1;
         if ( theOnlyTie == -1 ) theOnlyTie = i;
@@ -74,5 +72,5 @@ abstract public class SelectionBasedMethod extends LinearApportionmentMethod {
    * @param instance An instance of the apportionment problem.
    * @return The (reciprocal of the) proportionality constant (a*).
    */
-  abstract double unitSize(ApportionmentInstance instance);
+  abstract double unitSize(ApportionmentInstance instance, DivisorMethod method);
 }

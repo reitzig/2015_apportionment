@@ -1,0 +1,35 @@
+
+rw,ce,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW uniform SainteLague
+rw,ce,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW exponential SainteLague
+rw,ce,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW poisson SainteLague
+rw,ce,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW pareto1.5 SainteLague
+
+rw,ce,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW uniform GreatestDivisors
+rw,ce,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW exponential GreatestDivisors
+rw,ce,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW poisson GreatestDivisors
+rw,ce,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW pareto1.5 GreatestDivisors
+
+rw,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW uniform EqualProportions
+rw,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW exponential EqualProportions
+rw,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW poisson EqualProportions
+rw,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW pareto1.5 EqualProportions
+
+rw,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW uniform HarmonicMean
+rw,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW exponential HarmonicMean
+rw,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW poisson HarmonicMean
+rw,pupq,puls 10,30,50,70,90,110,130,150,170,190,210 10 10000 100 NOW pareto1.5 HarmonicMean
+
+
+rw,ce,pupq      1000,5000,10000,20000,30000,40000,50000 5 10 100 NOW uniform SainteLague
+rw,ce,pupq      1000,5000,10000,20000,30000,40000,50000 5 10 100 NOW exponential SainteLague
+rw,ce,pupq      1000,5000,10000,20000,30000,40000,50000 5 10 100 NOW poisson SainteLague
+rw,ce,pupq      1000,5000,10000,20000,30000,40000,50000 5 10 100 NOW pareto1.5 SainteLague
+
+rw,pupq      1000,5000,10000,20000,30000,40000,50000 5 10 100 NOW uniform EqualProportions
+rw,pupq      1000,5000,10000,20000,30000,40000,50000 5 10 100 NOW exponential EqualProportions
+rw,pupq      1000,5000,10000,20000,30000,40000,50000 5 10 100 NOW poisson EqualProportions
+rw,pupq      1000,5000,10000,20000,30000,40000,50000 5 10 100 NOW pareto1.5 EqualProportions
+
+# A bad-case scenario for Jump-and-Step; large n reveal non-linear running time behaviour
+#
+rw,pupq 100,1000,5000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000 2 100 1000 7777777777 pareto2 LDM(1,0.001)

@@ -3,9 +3,9 @@
 
 package de.unikl.cs.agak.appportionment.util;
 
-import edu.princeton.cs.introcs.StdIn;
-import edu.princeton.cs.introcs.StdOut;
-import edu.princeton.cs.introcs.StdRandom;
+import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.StdOut;
+import edu.princeton.cs.algs4.StdRandom;
 
 /*************************************************************************
  *  Compilation:  javac QuickPedantic.java

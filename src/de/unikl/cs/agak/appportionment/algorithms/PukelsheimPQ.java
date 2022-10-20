@@ -13,17 +13,19 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package de.unikl.cs.agak.appportionment.methods;
+package de.unikl.cs.agak.appportionment.algorithms;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
 import de.unikl.cs.agak.appportionment.experiments.AlgorithmWithCounters;
+import de.unikl.cs.agak.appportionment.methods.DivisorMethod;
+import de.unikl.cs.agak.appportionment.methods.LinearDivisorMethod;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
+import static de.unikl.cs.agak.appportionment.util.AssortedUtils.sum;
 
-import static edu.princeton.cs.introcs.StdStats.sum;
 
 /**
  * Implements the jump-and-step algorithm from
@@ -42,13 +44,8 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
    */
   private int lastCounter = -1;
 
-  public PukelsheimPQ(final double alpha, final double beta) {
-    super(alpha, beta);
-  }
-
-
   @Override
-  public Apportionment apportion(final ApportionmentInstance instance) {
+  public Apportionment apportion(final ApportionmentInstance instance, final DivisorMethod dm) {
     final int n = instance.votes.length;
 
     // Compute initial assignment
@@ -57,21 +54,30 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
     double sumPop = sum(instance.votes);
 
     final double D;
-    if ( isStationary() ) {
-      // Use recommended estimator (cf Pukelsheim, section 6.1) resp. its reciprocal
-      D = alpha * (instance.k + n * (beta / alpha - 0.5)) / sumPop;
-    }
-    else if ( beta / alpha <= 1.0 ) {
-      // Fallback to the universal estimator
-      D = alpha * instance.k / sumPop;
+    if ( dm instanceof LinearDivisorMethod ) {
+      final LinearDivisorMethod ldm = (LinearDivisorMethod)dm;
+      final double alpha = ldm.getAlpha();
+      final double beta = ldm.getBeta();
+      if ( dm.isStationary() ) {
+        // Use recommended estimator (cf Pukelsheim, section 6.1) resp. its reciprocal
+        D = alpha * (instance.k + n * (beta / alpha - 0.5)) / sumPop;
+      }
+      else if ( beta / alpha <= 1.0 ) {
+        // Fallback to the universal estimator, adjusted by the linear coefficient.
+        D = alpha * instance.k / sumPop;
+      }
+      else {
+        // Generalized estimator for sequences that are not real signposts
+        D = alpha * (instance.k + n * Math.floor(beta / alpha)) / sumPop;
+      }
     }
     else {
-      // Generalized estimator for sequences that are not real signposts
-      D = alpha * (instance.k + n * Math.floor(beta / alpha)) / sumPop;
+      // If the divisor method is not linear, Puk14 does not go beyond the universal estimator
+      D = instance.k / sumPop;
     }
 
     for ( int i = 0; i < n; i++ ) {
-      seats[i] = dRound(instance.votes[i] * D) + 1;
+      seats[i] = dm.dRound(instance.votes[i] * D) + 1;
     }
 
     int sumSeats = sum(seats);
@@ -113,7 +119,7 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
       final ArrayList<Entry> initials = new ArrayList<>(n);
       for ( int i = 0; i < n; i++ ) {
         if ( step == +1 || seats[i] > 0 ) { // in s>k setting, skip parties without any seats
-          initials.add(new Entry(i, d(seats[i] + offset) / instance.votes[i], order));
+          initials.add(new Entry(i, dm.d(seats[i] + offset) / instance.votes[i], order));
         }
       }
       final PriorityQueue<Entry> heap = new PriorityQueue<>(initials);
@@ -126,7 +132,7 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
 
         // Unless party i has no more seats to remove, re-add it into PQ
         if ( step == +1 || seats[i] != 0 ) {
-          e.value = d(seats[i] + offset) / instance.votes[i];
+          e.value = dm.d(seats[i] + offset) / instance.votes[i];
           heap.add(e);
         }
         sumSeats += step;
@@ -136,11 +142,11 @@ public class PukelsheimPQ extends IterativeMethod implements AlgorithmWithCounte
       double astar = 0.0;
       for ( int i = 0; i < seats.length; i++ ) {
         if ( seats[i] == 0 ) continue;
-        double cand = d(seats[i] - 1) / instance.votes[i];
+        double cand = dm.d(seats[i] - 1) / instance.votes[i];
         if ( cand > astar ) astar = cand;
       }
 
-      return determineTies(instance, seats, astar);
+      return determineTies(instance, dm, seats, astar);
     }
   }
 

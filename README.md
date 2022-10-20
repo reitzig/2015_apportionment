@@ -4,16 +4,18 @@ This repository contains implementations of algorithms for proportional
 apportionment with divisor methods. Inspect and use at your own risk.
 
  * File
-     [`SandwichSelect.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/SandwichSelect.java)
+     [`SandwichSelect.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/algorithms/SandwichSelect.java)
    contains an implementation of the algorithm `SandwichSelect` we have presented in
 
    > Wild, S. and Reitzig, R.  
    > A Practical and Worst-Case Efficient Algorithm for Divisor Methods of Apportionment  
    > submitted  
-   > [[preprint](http://arxiv.org/abs/1504.06475) (v2,2015)]
+   > [[preprint](http://arxiv.org/abs/1504.06475) (v3,2016)]
+   
+   Some variants exist.
 
  * In
-    [`ChengEppsteinSelect.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/ChengEppsteinSelect.java)
+    [`ChengEppsteinSelect.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/algorithms/ChengEppsteinSelect.java)
    we provide an implementation of the algorithm proposed in
 
    > Cheng, Z. and Eppstein, D.  
@@ -29,16 +31,16 @@ apportionment with divisor methods. Inspect and use at your own risk.
    > Springer, 2014
 
    in
-     [`PukelsheimPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/PukelsheimPQ.java)
+     [`PukelsheimPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/algorithms/PukelsheimPQ.java)
    with priority queues for determining the next party to modify, and in
-     [`PukelsheimLS.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/PukelsheimLS.java)
+     [`PukelsheimLS.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/algorithms/PukelsheimLS.java)
    using linear scan.
 
  * Finally, we give implementations of the naive iterative algorithms using
    priority queues resp. a linear scan for finding maxima in
-     [`IterativeDMPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/IterativeDMPQ.java)
+     [`IterativeDMPQ.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/algorithms/IterativeDMPQ.java)
    and
-     [`IterativeDMLS.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/methods/IterativeDMLS.java),
+     [`IterativeDMLS.java`](https://github.com/reitzig/2015_apportionment/blob/master/src/de/unikl/cs/agak/appportionment/algorithms/IterativeDMLS.java),
    respectively.
 
 The core algorithms start in the respective implementations of method `unitSize` resp. `apportion`.
@@ -50,7 +52,7 @@ license statement (see Q + A [here](http://algs4.cs.princeton.edu/code/)).
 
 ### Compilation
 
-Execute `ant compile`; you will need [`stdlib-package.jar`](http://algs4.cs.princeton.edu/code/stdlib-package.jar)
+Execute `ant compile`; you will need [`algs4.jar`](https://algs4.cs.princeton.edu/code/algs4.jar)
 (in folder `lib`) from the [book website of Sedgewick/Wayne](http://algs4.cs.princeton.edu/code/).
 
 ### Usage
@@ -62,7 +64,7 @@ Max-Min Inequality for *all* computed assignments, i.e. for all ways to resolve 
 Command `ant run` executes a sample runtime experiment.
 
 Run your own experiments by defining the parameters in a space-separated file
-(see e.g. [arxiv.experiment](https://github.com/reitzig/2015_apportionment/blob/master/arxiv.experiment); those are the ones from the article)
+(see e.g. [arxiv2.experiment](https://github.com/reitzig/2015_apportionment/blob/master/arxiv3.experiment); those are the ones from the article)
 and passing it as parameter to [`run_experiments.rb`](https://github.com/reitzig/2015_apportionment/blob/master/run_experiments.rb).
 That is, 
 
@@ -91,6 +93,8 @@ In case you can not get this to work, here is a workaround.
  4. For each non-comment line from `arxiv.experiment` (or your file), execute
       
         java -cp ../build de.unikl.csgak.appportionment.experiments.RunningTimeMain [line]
+        
+    If you use `LDM(x,y)` as divisor method, enclose this parameter in double-quotes.
  
  5. Execute `gnuplot tmp/*.gp`.
  

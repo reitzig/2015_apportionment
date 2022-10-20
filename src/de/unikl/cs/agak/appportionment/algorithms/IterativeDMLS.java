@@ -13,10 +13,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package de.unikl.cs.agak.appportionment.methods;
+package de.unikl.cs.agak.appportionment.algorithms;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.methods.DivisorMethod;
 
 /**
  * A naive implementation of divisor methods that assigns one seat after the other
@@ -24,12 +25,8 @@ import de.unikl.cs.agak.appportionment.ApportionmentInstance;
  */
 public class IterativeDMLS extends IterativeMethod {
 
-    public IterativeDMLS(final double alpha, final double beta) {
-        super(alpha, beta);
-    }
-
     @Override
-    public Apportionment apportion(final ApportionmentInstance instance) {
+    public Apportionment apportion(final ApportionmentInstance instance, final DivisorMethod dm) {
         final int n = instance.votes.length;
 
         // Initialize current values
@@ -37,7 +34,7 @@ public class IterativeDMLS extends IterativeMethod {
 
         // Seed list with initial values
         for (int i = 0; i < n; i++) {
-            values[i] = d(0) / instance.votes[i];
+            values[i] = dm.d(0) / instance.votes[i];
         }
 
         // Subsequently assign seats
@@ -52,7 +49,7 @@ public class IterativeDMLS extends IterativeMethod {
             }
 
             seats[imin]++;
-            values[imin] = d(seats[imin]) / instance.votes[imin];
+            values[imin] = dm.d(seats[imin]) / instance.votes[imin];
             k--;
         }
 
@@ -65,6 +62,6 @@ public class IterativeDMLS extends IterativeMethod {
         final double astar = values[imin];
         seats[imin]++;
 
-        return determineTies(instance, seats, astar);
+        return determineTies(instance, dm, seats, astar);
     }
 }

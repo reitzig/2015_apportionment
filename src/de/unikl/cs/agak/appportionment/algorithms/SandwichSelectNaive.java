@@ -13,35 +13,33 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package de.unikl.cs.agak.appportionment.methods;
+package de.unikl.cs.agak.appportionment.algorithms;
 
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.methods.AlmostLinearDivisorMethod;
+import de.unikl.cs.agak.appportionment.methods.DivisorMethod;
 
 import java.util.*;
 
 @Deprecated
-public class SandwichSelectNaive extends SelectionBasedMethod {
-
-  public SandwichSelectNaive(final double alpha, final double beta) {
-    super(alpha, beta);
-	}
+public class SandwichSelectNaive extends SelectionBasedAlgorithm {
 
 
     @Override
-    double unitSize(final ApportionmentInstance instance) {
-        final int n = instance.votes.length;
+    double unitSize(final ApportionmentInstance instance, final DivisorMethod method) {
+      final int n = instance.votes.length;
 
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;
         for (double p : instance.votes) {
             if (p > maxPop) maxPop = p;
 		}
-        double x_overbar = d(instance.k) / maxPop; // clearly suboptimal and feasible
+        double x_overbar =method.d(instance.k) / maxPop; // clearly suboptimal and feasible
 //		System.out.println("x_overbar = " + x_overbar);
 
 		Collection<Integer> I_x_overbar = new LinkedList<>();
 		for (int i = 0; i < n; ++i) {
-            if (instance.votes[i] > d(0) / x_overbar) {
+            if (instance.votes[i] > method.d(0) / x_overbar) {
                 I_x_overbar.add(i);
 			}
 		}
@@ -51,7 +49,7 @@ public class SandwichSelectNaive extends SelectionBasedMethod {
 		for (int i : I_x_overbar) {
             double v_i = instance.votes[i];
             for (int j = 0; j <= instance.k; ++j) {
-                A.add(d(j) / v_i);
+                A.add(method.d(j) / v_i);
 			}
 		}
 

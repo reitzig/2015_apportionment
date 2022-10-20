@@ -13,9 +13,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package de.unikl.cs.agak.appportionment.methods;
+package de.unikl.cs.agak.appportionment.algorithms;
 
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.methods.AlmostLinearDivisorMethod;
+import de.unikl.cs.agak.appportionment.methods.DivisorMethod;
 import de.unikl.cs.agak.appportionment.util.RankSelection;
 
 import java.util.Collection;
@@ -23,29 +25,33 @@ import java.util.LinkedList;
 
 import static de.unikl.cs.agak.appportionment.util.FuzzyNumerics.*;
 
-public class SandwichSelectWithOptimalityCheck extends SelectionBasedMethod {
-
-  public SandwichSelectWithOptimalityCheck(final double alpha, final double beta) {
-    super(alpha, beta);
-	}
+@Deprecated
+public class SandwichSelectWithOptimalityCheck extends SelectionBasedAlgorithm {
 
     @Override
-    double unitSize(final ApportionmentInstance instance) {
-        final int n = instance.votes.length;
+    double unitSize(final ApportionmentInstance instance, final DivisorMethod method) {
+      if (  !(method instanceof AlmostLinearDivisorMethod) ) {
+        throw new IllegalArgumentException(this.getClass().getSimpleName() + " only works for almost linear divisor sequences");
+      }
+      final AlmostLinearDivisorMethod dm = (AlmostLinearDivisorMethod)method;
+      final double alpha = dm.getAlpha();
+      final double beta = dm.getBetaUpper();
+
+      final int n = instance.votes.length;
 
 		// Find largest population
 		double maxPop = Double.NEGATIVE_INFINITY;
         for (double p : instance.votes) {
             if (p > maxPop) maxPop = p;
 		}
-        double x_overbar = d(instance.k - 1) / maxPop;
+        double x_overbar = dm.d(instance.k - 1) / maxPop;
 //		System.out.println("x_overbar = " + x_overbar);
-        if (isOptimal(instance.votes, instance.k, x_overbar)) return x_overbar;
+        if (isOptimal(instance.votes, instance.k, x_overbar, dm)) return x_overbar;
 
 		Collection<Integer> I_x_overbar = new LinkedList<>();
 		double Sigma_I_x_overbar = 0;
 		for (int i = 0; i < n; ++i) {
-            if (instance.votes[i] > d(0) / x_overbar) {
+            if (instance.votes[i] > dm.d(0) / x_overbar) {
                 I_x_overbar.add(i);
                 Sigma_I_x_overbar += instance.votes[i];
             }
@@ -71,14 +77,14 @@ public class SandwichSelectWithOptimalityCheck extends SelectionBasedMethod {
             double v_i = instance.votes[i];
             // If sequence is not contributing, deltaInv might be invalid (< 0 etc),
 			// so explicitly handle that case:
-			if (d(0) / v_i > a_overbar) continue;
+			if (dm.d(0) / v_i > a_overbar) continue;
 
 			// otherwise: add all elements between a_underbar and a_overbar
-			final double realMinJ = deltaInvRaw(v_i * a_underbar);
+			final double realMinJ = dm.deltaInvRaw(v_i * a_underbar);
 			final int minJ = realMinJ <= 0 ? 0 : fuzzyCeil(realMinJ);
-			final int maxJ = fuzzyFloor(deltaInvRaw(v_i * a_overbar));
+			final int maxJ = fuzzyFloor(dm.deltaInvRaw(v_i * a_overbar));
 			for (int j = minJ; j <= maxJ; ++j) {
-				A_hat[A_hat_size++] = d(j) / v_i;
+				A_hat[A_hat_size++] = dm.d(j) / v_i;
 			}
 			k_hat -= minJ; // Elements 0,1,...,minJ-1 missing from A_hat
 		}
@@ -92,15 +98,15 @@ public class SandwichSelectWithOptimalityCheck extends SelectionBasedMethod {
 		return RankSelection.select(A_hat, A_hat_size - 1, k_hat - 1);
 	}
 
-	boolean isOptimal(final double[] population, final int k, final double x) {
+	boolean isOptimal(final double[] population, final int k, final double x, final DivisorMethod dm) {
 		int rankX = 0;
 		int rankXMinusEpsilon = 0;
 
 		for (double v_i : population) {
 			// If sequence is not contributing, deltaInv might be invalid (< 0 etc),
 			// so explicitly handle that case:
-			if (d(0) / v_i > x) continue;
-			double deltaInv = deltaInvRaw(v_i * x);
+			if (dm.d(0) / v_i > x) continue;
+			double deltaInv = dm.deltaInvRaw(v_i * x);
 
 			Integer deltaInvInt = integer(deltaInv);
 			if (deltaInvInt != null) {

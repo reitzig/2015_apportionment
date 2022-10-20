@@ -13,10 +13,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package de.unikl.cs.agak.appportionment.methods;
+package de.unikl.cs.agak.appportionment.algorithms;
 
 import de.unikl.cs.agak.appportionment.Apportionment;
 import de.unikl.cs.agak.appportionment.ApportionmentInstance;
+import de.unikl.cs.agak.appportionment.methods.DivisorMethod;
 
 import java.util.ArrayList;
 import java.util.PriorityQueue;
@@ -27,18 +28,14 @@ import java.util.PriorityQueue;
  */
 public class IterativeDMPQ extends IterativeMethod {
 
-    public IterativeDMPQ(final double alpha, final double beta) {
-        super(alpha, beta);
-    }
-
     @Override
-    public Apportionment apportion(final ApportionmentInstance instance) {
+    public Apportionment apportion(final ApportionmentInstance instance, final DivisorMethod dm) {
         final int n = instance.votes.length;
 
         // Initialize heap
         final ArrayList<Entry> initials = new ArrayList<>(n);
         for (int i = 0; i < n; i++) {
-            initials.add(new Entry(i, d(0) / instance.votes[i]));
+            initials.add(new Entry(i, dm.d(0) / instance.votes[i]));
         }
         final PriorityQueue<Entry> heap = new PriorityQueue<>(initials);
 
@@ -49,7 +46,7 @@ public class IterativeDMPQ extends IterativeMethod {
             final Entry e = heap.poll();
             final int i = e.index;
             seats[i]++;
-            e.value = d(seats[i]) / instance.votes[i];
+            e.value = dm.d(seats[i]) / instance.votes[i];
             heap.add(e);
             k--;
         }
@@ -58,7 +55,7 @@ public class IterativeDMPQ extends IterativeMethod {
         final Entry e = heap.poll();
         seats[e.index]++;
 
-        return determineTies(instance, seats, e.value);
+        return determineTies(instance, dm, seats, e.value);
     }
 
     private static class Entry implements Comparable<Entry> {

@@ -1,0 +1,60 @@
+# These are the runtime experiments that appear in the current arXiv version
+# of our article.
+#
+# Non-comment lines have this format:
+#
+#   algorithms ns ks repetitionsPerInput inputsPerN randomSeed distribution divisorMethod
+#
+# where
+#  * 'algorithms'          is comma-separated list of any of 'rw', 'rwit', 'rw2, 
+#                            'ce', 'dmpq', 'dmls', 'pupq', 'puls'
+#  * 'ns'                  is a comma-separated list of integers
+#  * 'ks'                  is an integer, or a two-element comma-separated list 
+#                            of integers
+#  * 'repetitionsPerInput' is an integer
+#  * 'inputsPerN'          is an integer
+#  * 'randomSeed'          is an integer or the string 'NOW'
+#  * 'distribution'        is one of 'uniform', 'exponential', 'poisson', 'pareto1.5', 
+#                            'pareto2', 'pareto3'
+#  * 'divisorMethod'       is a method name or LDM(double,double)
+#
+# Script run_experiments.rb can take this file as an input and executes all
+# specified experiments independently and in the given order.
+
+# k = 100*n, Sainte-Lague resp. D'Hondt (cf. typical European national parliament)
+#
+rw2,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 1440696280371370 uniform LDM(2,1)
+rw2,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 1440696280371443 uniform LDM(1,1)
+rw2,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 1440696280371468 exponential LDM(2,1)
+rw2,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 1440696280371505 exponential LDM(1,1)
+rw2,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 1440696280371527 poisson LDM(2,1)
+rw2,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 1440696280371549 poisson LDM(1,1)
+rw2,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 1440696280371570 pareto1.5 LDM(2,1)
+rw2,ce,dmpq,dmls,pupq,puls 2,3,4,5,6,7,8,9,10 100 100000 100 1440696280371592 pareto1.5 LDM(1,1)
+
+# k = 10*n, approx. Huntington-Hill/Equal Proportions (cf. US House)
+#
+# Note that we use the linear upper bound, because that one is relevant for the 
+# upper bound on the candidate set of our algorithm. That is to make sure
+# we do not inadvertantly rig the experiment in our favor by cherry-picking 
+# one of several linear approximations.
+#
+rw2,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 10 10000 100 1440696280371631 uniform LDM(1,0.75)
+rw2,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 10 10000 100 1440696280371656 exponential LDM(1,0.75)
+rw2,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 10 10000 100 1440696280371681 poisson LDM(1,0.75)
+rw2,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 10 10000 100 1440696280371706 pareto1.5 LDM(1,0.75)
+
+# Hopefully meaningful experiments with k = 5*n, Sainte-Lague
+#
+rw2,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 5 10000 100 1440696280372819 uniform LDM(2,1)
+rw2,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 5 10000 100 1440696280372846 exponential LDM(2,1)
+rw2,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 5 10000 100 1440696280372876 poisson LDM(2,1)
+rw2,ce,pupq,puls 10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200 5 10000 100 1440696280372901 pareto1.5 LDM(2,1)
+rw2,ce,pupq      1000,5000,10000,20000,30000,40000,50000,75000,100000 5 10 100 1440696280372925 uniform LDM(2,1)
+rw2,ce,pupq      1000,5000,10000,20000,30000,40000,50000,75000,100000 5 10 100 1440696280372947 exponential LDM(2,1)
+rw2,ce,pupq      1000,5000,10000,20000,30000,40000,50000,75000,100000 5 10 100 1440696280372970 poisson LDM(2,1)
+rw2,ce,pupq      1000,5000,10000,20000,30000,40000,50000,75000,100000 5 10 100 1440696280372992 pareto1.5 LDM(2,1)
+
+# A bad-case scenario for Jump-and-Step; large n reveal non-linear running time behaviour
+#
+rw2,pupq 100,1000,5000,10000,20000,30000,40000,50000,60000,70000,80000,90000,100000 2 100 1000 7777777777 pareto2 LDM(1,0.001)
